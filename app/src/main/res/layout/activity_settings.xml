@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settings"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/header_panel_height"
+            android:orientation="horizontal"
+            tools:ignore="MissingConstraints">
+
+            <Button
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_vertical"
+                android:background="@android:color/transparent"
+                app:icon="@drawable/arrow_back"
+                app:iconTint="@color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="12dp"
+                android:text="@string/settings"
+                android:textColor="@color/black"
+                android:textSize="@dimen/header_text_size"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/header_panel_height"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
+            tools:ignore="MissingConstraints">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="12dp"
+                android:text="@string/dark_theme"
+                android:textColor="@color/black"
+                android:textSize="@dimen/default_size" />
+
+            <Switch
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="end"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+        </FrameLayout>
+
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/setting_button_height"
+            android:background="@android:color/transparent"
+            android:text="@string/link_app"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="@dimen/default_size"
+            app:icon="@drawable/share"
+            app:iconGravity="end"
+            app:iconTint="@color/grey" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/setting_button_height"
+            android:background="@android:color/transparent"
+            android:text="@string/link_support"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="@dimen/default_size"
+            app:icon="@drawable/support"
+            app:iconGravity="end"
+            app:iconTint="@color/grey" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/setting_button_height"
+            android:background="@android:color/transparent"
+            android:text="@string/documentation"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="@dimen/default_size"
+            app:icon="@drawable/arrow_forward"
+            app:iconGravity="end"
+            app:iconTint="@color/grey" />
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
