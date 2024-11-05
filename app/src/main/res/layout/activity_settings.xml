@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/settings"
     style="@style/settingsActivityStyle">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,8 +18,7 @@
             <Button
                 style="@style/arrowBack"
                 android:id="@+id/settings_back"
-                app:icon="@drawable/arrow_back"
-                app:iconTint="@color/black" />
+                app:icon="@drawable/arrow_back"/>
             <TextView
                 style="@style/headerText"
                 android:layout_gravity="center_vertical"
@@ -28,7 +26,6 @@
                 android:layout_marginTop="0dp"
                 android:text="@string/settings"/>
         </LinearLayout>
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/setting_button_height"
@@ -44,7 +41,6 @@
                 android:layout_gravity="center_vertical|end"
                 tools:ignore="UseSwitchCompatOrMaterialXml" />
         </FrameLayout>
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/setting_button_height"
@@ -53,13 +49,11 @@
             <TextView
                 style="@style/settingsActivityText"
                 android:text="@string/link_app"/>
-
             <ImageView
                 style="@style/settingActivityIcons"
                 android:layout_height="wrap_content"
                 android:src="@drawable/share"/>
         </FrameLayout>
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/setting_button_height"
@@ -72,7 +66,6 @@
                 style="@style/settingActivityIcons"
                 android:src="@drawable/support"/>
         </FrameLayout>
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/setting_button_height"
