@@ -2,11 +2,10 @@ package com.example.playlistmaker
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.FrameLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -24,12 +23,33 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
+        val shareApp = findViewById<FrameLayout>(R.id.shareApp)
+        val writeToSupport = findViewById<FrameLayout>(R.id.writeToSupport)
+        val userAgreement = findViewById<FrameLayout>(R.id.userAgreement)
         val settingsBack = findViewById<Button>(R.id.settings_back)
 
         settingsBack.setOnClickListener {
             val backIntent = Intent(this, MainActivity::class.java)
             startActivity(backIntent)
         }
-
+        shareApp.setOnClickListener {
+            val shareIntent = Intent(Intent.ACTION_SENDTO)
+            shareIntent.data = Uri.parse("mailto:")
+            shareIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("yourEmail@ya.ru"))
+            shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.android_developerYP_page))
+            startActivity(shareIntent)
+        }
+        writeToSupport.setOnClickListener {
+            val writeToSupportIntent = Intent(Intent.ACTION_SENDTO)
+            writeToSupportIntent.data = Uri.parse("mailto:")
+            writeToSupportIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_mail)))
+            writeToSupportIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.subject_to_write_support))
+            writeToSupportIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.text_for_support))
+            startActivity(writeToSupportIntent)
+        }
+        userAgreement.setOnClickListener {
+            val userAgreementIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.agreement_link)))
+            startActivity(userAgreementIntent)
+        }
     }
 }

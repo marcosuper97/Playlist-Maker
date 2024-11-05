@@ -42,6 +42,7 @@
                 tools:ignore="UseSwitchCompatOrMaterialXml" />
         </FrameLayout>
         <FrameLayout
+            android:id="@+id/shareApp"
             android:layout_width="match_parent"
             android:layout_height="@dimen/setting_button_height"
             android:orientation="horizontal"
@@ -55,6 +56,7 @@
                 android:src="@drawable/share"/>
         </FrameLayout>
         <FrameLayout
+            android:id="@+id/writeToSupport"
             android:layout_width="match_parent"
             android:layout_height="@dimen/setting_button_height"
             android:orientation="horizontal"
@@ -67,6 +69,7 @@
                 android:src="@drawable/support"/>
         </FrameLayout>
         <FrameLayout
+            android:id="@+id/userAgreement"
             android:layout_width="match_parent"
             android:layout_height="@dimen/setting_button_height"
             android:orientation="horizontal"
