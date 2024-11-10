@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/settings"
-    style="@style/settingsActivityStyle">
+    style="@style/activityStyle">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -36,10 +36,10 @@
                 android:text="@string/dark_theme"
                 style="@style/settingsActivityText"/>
             <Switch
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical|end"
-                tools:ignore="UseSwitchCompatOrMaterialXml" />
+                style="@style/switchDarkTheme"
+                tools:ignore="UseSwitchCompatOrMaterialXml"
+                android:switchMinWidth="56dp"
+                />
         </FrameLayout>
         <FrameLayout
             android:id="@+id/shareApp"

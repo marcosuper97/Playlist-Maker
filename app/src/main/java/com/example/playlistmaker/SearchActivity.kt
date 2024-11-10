@@ -13,9 +13,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.android.material.internal.ViewUtils.hideKeyboard
 
 class SearchActivity : AppCompatActivity() {
+    private var searchQuery: String = STR_DEF
+    companion object {
+        const val KEY_SEARCH_QUERY: String = "SEARCH_QUERY"
+        const val STR_DEF: String = ""
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -25,14 +29,20 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        val clearButton = findViewById<LinearLayout>(R.id.clearButton)
         val searchInput = findViewById<EditText>(R.id.search_hint)
+        if (savedInstanceState != null) {
+            searchQuery = savedInstanceState.getString(KEY_SEARCH_QUERY, STR_DEF) ?: STR_DEF
+            searchInput.setText(searchQuery)
+            //Toast.makeText(this, searchQuery, Toast.LENGTH_LONG).show()
+        }
+        val clearButton = findViewById<LinearLayout>(R.id.clearButton)
         val searchBack = findViewById<Button>(R.id.search_back)
         val simpleTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearButton.visibility = clearButtonVisibility(s)
+                searchQuery = s.toString()
             }
             override fun afterTextChanged(p0: Editable?) {
             }
@@ -44,11 +54,21 @@ class SearchActivity : AppCompatActivity() {
             startActivity(backIntent)
         }
         clearButton.setOnClickListener {
-            searchInput.setText("")
+            searchInput.setText(STR_DEF)
             hideKeyboard(this, clearButton)
         }
     }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(KEY_SEARCH_QUERY,searchQuery)
+
+    }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        searchQuery = savedInstanceState.getString(KEY_SEARCH_QUERY, STR_DEF) ?: STR_DEF
+    }
 }
+
 private fun clearButtonVisibility(s: CharSequence?): Int {
     return if (s.isNullOrEmpty()) {
         View.GONE
