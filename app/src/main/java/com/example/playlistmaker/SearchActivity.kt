@@ -16,10 +16,6 @@ import androidx.core.view.WindowInsetsCompat
 
 class SearchActivity : AppCompatActivity() {
     private var searchQuery: String = STR_DEF
-    companion object {
-        const val KEY_SEARCH_QUERY: String = "SEARCH_QUERY"
-        const val STR_DEF: String = ""
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -49,8 +45,7 @@ class SearchActivity : AppCompatActivity() {
         searchInput.addTextChangedListener(simpleTextWatcher)
         searchInput.requestFocus()
         searchBack.setOnClickListener {
-            val backIntent = Intent(this, MainActivity::class.java)
-            startActivity(backIntent)
+            finish()
         }
         clearButton.setOnClickListener {
             searchInput.setText(STR_DEF)
@@ -66,17 +61,20 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         searchQuery = savedInstanceState.getString(KEY_SEARCH_QUERY, STR_DEF) ?: STR_DEF
     }
-}
-
-private fun clearButtonVisibility(s: CharSequence?): Int {
-    return if (s.isNullOrEmpty()) {
+    private fun clearButtonVisibility(s: CharSequence?): Int {
+        return if (s.isNullOrEmpty()) {
         View.GONE
-    } else {
+        } else {
         View.VISIBLE
+        }
+    }
+    private fun hideKeyboard(context: Context, view: View) {
+        val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+    companion object {
+        const val KEY_SEARCH_QUERY: String = "SEARCH_QUERY"
+        const val STR_DEF: String = ""
     }
 }
 
-private fun hideKeyboard(context: Context, view: View) {
-    val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-}

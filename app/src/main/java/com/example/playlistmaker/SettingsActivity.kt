@@ -29,15 +29,14 @@ class SettingsActivity : AppCompatActivity() {
         val settingsBack = findViewById<Button>(R.id.settings_back)
 
         settingsBack.setOnClickListener {
-            val backIntent = Intent(this, MainActivity::class.java)
-            startActivity(backIntent)
+            finish()
         }
         shareApp.setOnClickListener {
-            val shareIntent = Intent(Intent.ACTION_SENDTO)
-            shareIntent.data = Uri.parse("mailto:")
-            shareIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("yourEmail@ya.ru"))
-            shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.android_developerYP_page))
-            startActivity(shareIntent)
+            val shareIntent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:")
+                putExtra(Intent.EXTRA_EMAIL, arrayOf("yourEmail@ya.ru"))
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.android_developerYP_page))
+            }
         }
         writeToSupport.setOnClickListener {
             val writeToSupportIntent = Intent(Intent.ACTION_SENDTO)
