@@ -33,7 +33,6 @@ class SearchActivity : AppCompatActivity() {
         if (savedInstanceState != null) {
             searchQuery = savedInstanceState.getString(KEY_SEARCH_QUERY, STR_DEF) ?: STR_DEF
             searchInput.setText(searchQuery)
-            //Toast.makeText(this, searchQuery, Toast.LENGTH_LONG).show()
         }
         val clearButton = findViewById<LinearLayout>(R.id.clearButton)
         val searchBack = findViewById<Button>(R.id.search_back)
