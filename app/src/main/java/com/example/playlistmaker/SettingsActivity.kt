@@ -37,13 +37,15 @@ class SettingsActivity : AppCompatActivity() {
                 putExtra(Intent.EXTRA_EMAIL, arrayOf("yourEmail@ya.ru"))
                 putExtra(Intent.EXTRA_TEXT, getString(R.string.android_developerYP_page))
             }
+            startActivity(shareIntent)
         }
         writeToSupport.setOnClickListener {
-            val writeToSupportIntent = Intent(Intent.ACTION_SENDTO)
-            writeToSupportIntent.data = Uri.parse("mailto:")
-            writeToSupportIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_mail)))
-            writeToSupportIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.subject_to_write_support))
-            writeToSupportIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.text_for_support))
+            val writeToSupportIntent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:")
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_mail)))
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.subject_to_write_support))
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.text_for_support))
+            }
             startActivity(writeToSupportIntent)
         }
         userAgreement.setOnClickListener {
