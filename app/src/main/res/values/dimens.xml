@@ -6,4 +6,5 @@
     <dimen name="main_menu_button_radius">16dp</dimen>
     <dimen name="setting_button_height">61dp</dimen>
     <dimen name="margin_settingsActivity_buttons">16dp</dimen>
+    <dimen name="search_bar_height">36dp</dimen>
 </resources>
