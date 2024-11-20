@@ -11,8 +11,11 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class SearchActivity : AppCompatActivity() {
     private var searchQuery: String = STR_DEF
@@ -25,6 +28,10 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        val trackMeeting: ArrayList<Track> = getMockTracks(this)
+        val recViewSearch = findViewById<RecyclerView>(R.id.recyclerViewSearch)
+            recViewSearch.adapter = TrackSearchAdapter(trackMeeting)
+            recViewSearch.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         val searchInput = findViewById<EditText>(R.id.search_hint)
         if (savedInstanceState != null) {
             searchQuery = savedInstanceState.getString(KEY_SEARCH_QUERY, STR_DEF) ?: STR_DEF
@@ -52,10 +59,10 @@ class SearchActivity : AppCompatActivity() {
             hideKeyboard(this, clearButton)
         }
     }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(KEY_SEARCH_QUERY,searchQuery)
-
     }
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)

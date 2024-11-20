@@ -36,6 +36,7 @@
                 android:text="@string/dark_theme"
                 style="@style/settingsActivityText"/>
             <Switch
+                android:id="@+id/switchThemeSwap"
                 style="@style/switchDarkTheme"
                 tools:ignore="UseSwitchCompatOrMaterialXml"
                 android:switchMinWidth="56dp"
