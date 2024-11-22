@@ -6,13 +6,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.Switch
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class SettingsActivity : AppCompatActivity() {
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -27,7 +27,11 @@ class SettingsActivity : AppCompatActivity() {
         val writeToSupport = findViewById<FrameLayout>(R.id.writeToSupport)
         val userAgreement = findViewById<FrameLayout>(R.id.userAgreement)
         val settingsBack = findViewById<Button>(R.id.settings_back)
+        val switchTheme = findViewById<Switch>(R.id.switchThemeSwap)
 
+        switchTheme.setOnClickListener{
+
+        }
         settingsBack.setOnClickListener {
             finish()
         }
