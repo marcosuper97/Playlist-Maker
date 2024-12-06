@@ -47,11 +47,40 @@
                     android:src="@drawable/cross"/>
             </LinearLayout>
         </FrameLayout>
-        <androidx.recyclerview.widget.RecyclerView
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewSearch"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="visible"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+            <LinearLayout
+                android:id="@+id/searchPlaceholder"
+                style="@style/errorPlaceholder"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/errorImagePlaceholder"
+                    style="@style/statusPlaceholder"
+                    tools:src = "@drawable/tracks_not_found"/>
+
+                <TextView
+                    android:id="@+id/errorStatus"
+                    style="@style/statusTextPlaceholder"
+                    tools:text = "@string/network_error"/>
+
+                <TextView
+                    android:id="@+id/searchUpdate"
+                    style="@style/updateButtonPlaceholder"/>
+
+            </LinearLayout>
+
+        </FrameLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
