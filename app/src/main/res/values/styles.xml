@@ -36,6 +36,7 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:hint">@string/search</item>
         <item name="android:textColorHint">@color/grey</item>
+        <item name="android:textColor">@color/black</item>
         <item name="android:maxLength">35</item>
         <item name="maxLines">1</item>
         <item name="android:inputType">text</item>
@@ -45,6 +46,7 @@
         <item name="drawableTint">@color/grey</item>
         <item name="android:imeOptions">actionDone</item>
         <item name="singleLine">true</item>
+        <item name="android:textCursorDrawable">@drawable/cursor_edit_text</item>
     </style>
     <style name="mainButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:layout_width">match_parent</item>
