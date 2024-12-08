@@ -36,12 +36,7 @@ import java.util.concurrent.TimeUnit
 
 class SearchActivity : AppCompatActivity() {
     private var searchQuery: String = STR_DEF
-    private val baseUrlItunes: String = "https://itunes.apple.com"
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(baseUrlItunes)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    private val iTunesService = retrofit.create(ITunesApi::class.java)
+    private val iTunesService = ItunesApiClient.tunesService
     private var tracks = ArrayList<Track>()
     private val adapter = TrackSearchAdapter()
     lateinit var searchError: View
@@ -60,7 +55,7 @@ class SearchActivity : AppCompatActivity() {
             recViewSearch.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
             recViewSearch.adapter=adapter
         val searchInput = findViewById<EditText>(R.id.search_hint)
-        val clearButton = findViewById<LinearLayout>(R.id.clearButton)
+        val clearButton = findViewById<ImageView>(R.id.clearButton)
         val searchBack = findViewById<Button>(R.id.search_back)
         searchError = findViewById<LinearLayout>(R.id.searchPlaceholder)
         val errorImagePlaceholder = findViewById<ImageView>(R.id.errorImagePlaceholder)

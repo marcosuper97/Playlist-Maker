@@ -11,11 +11,12 @@
         <item name="android:layout_gravity">center_vertical|end</item>
     </style>
     <style name="searchCross">
-        <item name="android:layout_marginTop">10dp</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_gravity">center_vertical|end</item>
         <item name="tint">@color/black</item>
+        <item name="android:src">@drawable/cross</item>
+        <item name="android:visibility">gone</item>
     </style>
     <style name="searchBar">
         <item name="android:orientation">horizontal</item>
