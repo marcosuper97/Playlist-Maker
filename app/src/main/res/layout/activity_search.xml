@@ -3,30 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/searchTwo"
+    android:id="@+id/searchActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:layout_editor_absoluteX="0dp"
-    tools:layout_editor_absoluteY="0dp"
-    tools:context=".SearchActivity"
     style="@style/activityStyle">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/header_panel_height"
-        android:orientation="horizontal"
-        tools:ignore="MissingConstraints">
-        <Button
-            style="@style/arrowBack"
-            android:id="@+id/search_back"
-            app:icon="@drawable/arrow_back"/>
-        <TextView
-            style="@style/headerText"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="0dp"
-            android:text="@string/search"/>
-    </LinearLayout>
+    <Toolbar
+        android:id="@+id/search_back"
+        style="@style/toolbarStyle"
+        android:navigationIcon="@drawable/arrow_back"
+        android:title="@string/search"
+        />
     <FrameLayout
         style="@style/searchBar">
         <EditText

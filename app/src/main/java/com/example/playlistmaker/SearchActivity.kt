@@ -16,6 +16,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.Toolbar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -45,7 +46,7 @@ class SearchActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_search)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.searchTwo)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.searchActivity)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -56,7 +57,7 @@ class SearchActivity : AppCompatActivity() {
             recViewSearch.adapter=adapter
         val searchInput = findViewById<EditText>(R.id.search_hint)
         val clearButton = findViewById<ImageView>(R.id.clearButton)
-        val searchBack = findViewById<Button>(R.id.search_back)
+        val searchBack = findViewById<Toolbar>(R.id.search_back)
         searchError = findViewById<LinearLayout>(R.id.searchPlaceholder)
         val errorImagePlaceholder = findViewById<ImageView>(R.id.errorImagePlaceholder)
         val errorStatus = findViewById<TextView>(R.id.errorStatus)

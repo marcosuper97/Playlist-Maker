@@ -1,16 +1,16 @@
 package com.example.playlistmaker
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.Switch
+import android.widget.Toolbar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,11 +23,11 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
-        val shareApp = findViewById<FrameLayout>(R.id.shareApp)
-        val writeToSupport = findViewById<FrameLayout>(R.id.writeToSupport)
-        val userAgreement = findViewById<FrameLayout>(R.id.userAgreement)
-        val settingsBack = findViewById<Button>(R.id.settings_back)
-        val switchTheme = findViewById<Switch>(R.id.switchThemeSwap)
+        val shareApp = findViewById<MaterialTextView>(R.id.linkApp)
+        val writeToSupport = findViewById<MaterialTextView>(R.id.writeToSupport)
+        val userAgreement = findViewById<MaterialTextView>(R.id.userAgreement)
+        val settingsBack = findViewById<Toolbar>(R.id.settings_back)
+        val switchTheme = findViewById<SwitchMaterial>(R.id.switchThemeSwap)
 
         switchTheme.setOnClickListener{
 
