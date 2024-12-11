@@ -9,12 +9,14 @@
         android:id="@+id/cover"
         style="@style/trackLayoutCoverStyle"
         tools:src="@drawable/track_placeholder"/>
-        <TextView
-            style="@style/trackLayoutHeader"
-            android:id="@+id/track_name"
-            android:maxLines="1"
-            android:ellipsize="end"
-            tools:text="Очень длинное название трека, которое будет обрезано и заменено многоточием"/>
+
+    <TextView
+        style="@style/trackLayoutHeader"
+        android:id="@+id/track_name"
+        android:maxLines="1"
+        android:ellipsize="end"
+        tools:text="Очень длинное название трека, которое будет обрезано и заменено многоточием"/>
+
     <LinearLayout
         style="@style/trackLayoutLinearDescription">
         <TextView
@@ -22,24 +24,28 @@
             style="@style/trackLayoutDescription"
             android:maxLines="1"
             android:ellipsize="end"
-            tools:text="@string/track_one_name"/>
+            tools:text="текст"/>
+
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/trackLayoutIcons"
             android:src="@drawable/point"/>
+
         <TextView
             android:id="@+id/duration"
             style="@style/trackLayoutDescription"
             android:maxLines="1"
             android:ellipsize="end"
-            tools:text="@string/track_one_name"/>
+            tools:text="текст"/>
     </LinearLayout>
+
     <ImageView
         android:id="@+id/trackLayoutForward"
         android:src="@drawable/arrow_forward"
         android:layout_gravity="center_vertical|end"
-        android:layout_marginEnd="12dp"
+        android:layout_marginEnd="20dp"
         style="@style/trackLayoutIcons"
         />
+
 </FrameLayout>
