@@ -1,53 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/searchActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     style="@style/activityStyle">
+
     <Toolbar
         android:id="@+id/search_back"
         style="@style/toolbarStyle"
         android:navigationIcon="@drawable/arrow_back"
-        android:title="@string/search"
-        />
+        android:title="@string/search"/>
+
     <FrameLayout
         style="@style/searchBar">
         <EditText
             android:id="@+id/search_hint"
             style="@style/searchBarEditText"/>
-            <ImageView
-                android:id="@+id/clearButton"
-                style="@style/searchCross"/>
+        <ImageView
+            android:id="@+id/clearButton"
+            style="@style/searchCross"/>
     </FrameLayout>
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewSearch"
-        android:layout_marginTop="16dp"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-        <LinearLayout
-            android:id="@+id/searchPlaceholder"
-            style="@style/errorPlaceholder"
-            android:visibility="gone">
-            <ImageView
-                android:id="@+id/errorImagePlaceholder"
-                style="@style/statusPlaceholder"
-                tools:src = "@drawable/tracks_not_found"/>
-            <TextView
-                android:id="@+id/errorStatus"
-                style="@style/statusTextPlaceholder"
-                tools:text = "@string/network_error"/>
-            <TextView
-                android:id="@+id/searchUpdate"
-                style="@style/updateButtonPlaceholder"/>
-        </LinearLayout>
-    </FrameLayout>
-</LinearLayout>
+        android:layout_marginTop="124dp"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/you_searched_it"
+            style="@style/youSearchedIt"
+            android:text="@string/you_searched_it"
+            android:visibility="gone"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="visible"/>
+        <TextView
+            android:id="@+id/clear_search_history"
+            style="@style/buttonSearchActivity"
+            android:layout_width="148dp"
+            android:text="@string/clear_history"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/searchPlaceholder"
+        style="@style/errorPlaceholder"
+        android:visibility="gone">
+        <ImageView
+            android:id="@+id/errorImagePlaceholder"
+            style="@style/statusPlaceholder"
+            tools:src = "@drawable/tracks_not_found"/>
+        <TextView
+            android:id="@+id/errorStatus"
+            style="@style/statusTextPlaceholder"
+            tools:text = "@string/network_error"/>
+        <TextView
+            android:id="@+id/searchUpdate"
+            style="@style/buttonSearchActivity"
+            android:layout_width="91dp"
+            android:text="@string/update"/>
+    </LinearLayout>
+</FrameLayout>

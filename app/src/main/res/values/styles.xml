@@ -26,11 +26,8 @@
         <item name="android:backgroundTint">@color/light_grey</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/search_bar_height</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
-        <item name="android:layout_marginStart">16dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
-        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_marginTop">64dp</item>
+        <item name="android:layout_marginHorizontal">16dp</item>
     </style>
     <style name="searchBarEditText">
         <item name="android:paddingStart">12dp</item>
@@ -150,7 +147,7 @@
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">19sp</item>
     </style>
-    <style name="updateButtonPlaceholder">
+    <style name="buttonSearchActivity">
         <item name="android:layout_width">91dp</item>
         <item name="android:layout_height">36dp</item>
         <item name="android:layout_marginTop">24dp</item>
@@ -169,5 +166,14 @@
         <item name="android:layout_gravity">center_horizontal</item>
         <item name="android:orientation">vertical</item>
         <item name="android:visibility">gone</item>
+    </style>
+    <style name="youSearchedIt">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/searchedIt</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:gravity">center</item>
+        <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="android:textSize">@dimen/size_you_searched_it</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 </resources>

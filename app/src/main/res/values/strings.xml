@@ -16,4 +16,6 @@
     <string name="tracks_not_found">Ничего не нашлось</string>
     <string name="update">Обновить</string>
     <string name="emptyText">"Введите название мелодии для поиска"</string>
+    <string name="you_searched_it">Вы искали это</string>
+    <string name="clear_history">Очистить историю</string>
 </resources>

@@ -1,8 +1,7 @@
 package com.example.playlistmaker
 
-import android.graphics.Color
-import android.view.RoundedCorner
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -11,7 +10,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class TrackSearchViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+class SearchViewHolder(itemView: View, private val tracksOnClickListener: TracksOnClickListener): RecyclerView.ViewHolder(itemView) {
 
     private val trackName: TextView = itemView.findViewById(R.id.track_name)
     private val executor: TextView = itemView.findViewById(R.id.executor)
@@ -19,6 +18,12 @@ class TrackSearchViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
     private val cover: ImageView = itemView.findViewById(R.id.cover)
 
     fun bind(track: Track) {
+        itemView.setOnClickListener {
+            val position = adapterPosition
+            if (position != RecyclerView.NO_POSITION) {
+                tracksOnClickListener.onItemClick(position)
+            }
+        }
         trackName.text = track.trackName
         executor.text = track.artistName
         duration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
@@ -29,5 +34,7 @@ class TrackSearchViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
             .transform(RoundedCorners(10))
             .into(cover)
     }
+
+
 
 }

@@ -16,10 +16,11 @@
         android:title="@string/settings"/>
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switchThemeSwap"
+        android:id="@+id/themeSwitcher"
         style="@style/switchDarkTheme"
         android:text="@string/dark_theme"
-        android:paddingEnd="6dp"/>
+        android:paddingEnd="6dp"
+        />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/linkApp"

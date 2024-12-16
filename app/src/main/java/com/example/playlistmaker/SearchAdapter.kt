@@ -4,16 +4,16 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class TrackSearchAdapter () : RecyclerView.Adapter<TrackSearchViewHolder> () {
+class SearchAdapter (private val tracksOnClickListener: TracksOnClickListener) : RecyclerView.Adapter<SearchViewHolder> () {
 
     var tracks = ArrayList<Track>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackSearchViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.track_layout, parent, false)
-        return TrackSearchViewHolder(view)
+        return SearchViewHolder(view, tracksOnClickListener)
     }
 
-    override fun onBindViewHolder(holder: TrackSearchViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
         holder.bind(tracks[position])
     }
 
