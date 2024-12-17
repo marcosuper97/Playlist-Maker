@@ -5,14 +5,14 @@ import com.google.gson.reflect.TypeToken
 
 object GsonClient {
 
-private val gson = Gson()
+    private val gson = Gson()
 
-    fun toJson(tracks: ArrayList<Track>): String {
+    fun toJson(tracks: MutableList<Track>): String {
         return gson.toJson(tracks)
     }
 
-    fun fromJson(json: String): ArrayList<Track> {
-        val type = object : TypeToken<ArrayList<Track>>() {}.type
+    fun fromJson(json: String): MutableList<Track> {
+        val type = object : TypeToken<MutableList<Track>>() {}.type
         return gson.fromJson(json, type)
     }
 }

@@ -19,12 +19,13 @@ object PreferencesManager {
         darkThemePreferences = context.getSharedPreferences(DARK_PREFERENCES, Context.MODE_PRIVATE)
     }
 
-    fun initSearchHistory(context: Context){
-        searchHistoryPreferences = context.getSharedPreferences(HISTORY_PREFERENCES, Context.MODE_PRIVATE)
+    fun initSearchHistory(context: Context) {
+        searchHistoryPreferences =
+            context.getSharedPreferences(HISTORY_PREFERENCES, Context.MODE_PRIVATE)
     }
 
-    fun saveSearchHistory(list:ArrayList<Track>) {
-        val json = GsonClient.toJson(list)
+    fun saveSearchHistory(history: MutableList<Track>) {
+        val json = GsonClient.toJson(history)
         searchHistoryPreferences.edit().putString(HISTORY_LIST, json).apply()
     }
 
@@ -32,13 +33,12 @@ object PreferencesManager {
         darkThemePreferences.edit().putBoolean(DARK_THEME, value).apply()
     }
 
-    fun getSearchHistory(): ArrayList<Track> {
+    fun getSearchHistory(): MutableList<Track> {
         val json = searchHistoryPreferences.getString(HISTORY_LIST, "") ?: ""
         if (json.isNotEmpty()) {
             val trackHistory = GsonClient.fromJson(json)
             return trackHistory
-        }
-        else return ArrayList<Track>()
+        } else return mutableListOf<Track>()
     }
 
     fun getBoolean(): Boolean {

@@ -33,7 +33,7 @@ class SettingsActivity : AppCompatActivity() {
             (applicationContext as App).switchDarkTheme(checked)
             PreferencesManager.saveThemeStatus(checked)
         }
-        settingsBack.setOnClickListener {
+        settingsBack.setNavigationOnClickListener {
             finish()
         }
         shareApp.setOnClickListener {
@@ -54,7 +54,8 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(writeToSupportIntent)
         }
         userAgreement.setOnClickListener {
-            val userAgreementIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.agreement_link)))
+            val userAgreementIntent =
+                Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.agreement_link)))
             startActivity(userAgreementIntent)
         }
     }
