@@ -8,8 +8,10 @@
     <dimen name="margin_settingsActivity_buttons">16dp</dimen>
     <dimen name="search_bar_height">36dp</dimen>
     <dimen name="description_info">11sp</dimen>
-    <dimen name="placeholder_vertical_orientation">102dp</dimen>
+    <dimen name="placeholder_vertical_orientation">210dp</dimen>
     <dimen name="placeholder_horizontal_orientation">40dp</dimen>
     <dimen name="padding_start_settings">16dp</dimen>
     <dimen name="padding_vertical_settings">21dp</dimen>
+    <dimen name="searchedIt">52dp</dimen>
+    <dimen name="size_you_searched_it">19sp</dimen>
 </resources>

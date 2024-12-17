@@ -1,16 +1,13 @@
 package com.example.playlistmaker
+
 import android.content.Context
 import android.content.pm.ActivityInfo
-import android.content.res.Configuration
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -21,25 +18,18 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.util.Objects
-import java.util.concurrent.TimeUnit
 
 class SearchActivity : AppCompatActivity() {
     private var searchQuery: String = STR_DEF
     private val iTunesService = ItunesApiClient.tunesService
-    private var tracks = ArrayList<Track>()
-    private val adapter = TrackSearchAdapter()
+    private var tracks = mutableListOf<Track>()
+    lateinit var searchHistory: MutableList<Track>
+    lateinit var searchAdapter: SearchAdapter
     lateinit var searchError: View
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,10 +41,7 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        adapter.tracks = tracks
-        val recViewSearch = findViewById<RecyclerView>(R.id.recyclerViewSearch)
-            recViewSearch.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-            recViewSearch.adapter=adapter
+
         val searchInput = findViewById<EditText>(R.id.search_hint)
         val clearButton = findViewById<ImageView>(R.id.clearButton)
         val searchBack = findViewById<Toolbar>(R.id.search_back)
@@ -62,65 +49,147 @@ class SearchActivity : AppCompatActivity() {
         val errorImagePlaceholder = findViewById<ImageView>(R.id.errorImagePlaceholder)
         val errorStatus = findViewById<TextView>(R.id.errorStatus)
         val searchUpdate = findViewById<TextView>(R.id.searchUpdate)
+        val recViewSearch = findViewById<RecyclerView>(R.id.recyclerView)
+        val youSearchedIt = findViewById<TextView>(R.id.you_searched_it)
+        val clearHistory = findViewById<TextView>(R.id.clear_search_history)
         val simpleTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearButton.visibility = clearButtonVisibility(s)
-                if (tracks.isNotEmpty()){
+                if (tracks.isNotEmpty()) {
                     clearButton.visibility = View.VISIBLE
                 }
                 searchQuery = s.toString()
             }
+
             override fun afterTextChanged(p0: Editable?) {}
         }
+
+        searchHistory = PreferencesManager.getSearchHistory()
+        searchAdapter = SearchAdapter(object : TracksOnClickListener {
+            override fun onItemClick(track: Track) {
+                try {
+                    if (searchHistory.count() < MAX_COUNT_SEARCH_HISTORY && !searchHistory.contains(
+                            track
+                        )
+                    ) {
+                        searchHistory.add(0, track)
+                        PreferencesManager.saveSearchHistory(searchHistory)
+                    } else if (searchHistory.count() <= MAX_COUNT_SEARCH_HISTORY && searchHistory.contains(
+                            track
+                        )
+                    ) {
+                        searchHistory.remove(track)
+                        searchHistory.add(0, track)
+                        PreferencesManager.saveSearchHistory(searchHistory)
+                    } else if (searchHistory.count() == MAX_COUNT_SEARCH_HISTORY && !searchHistory.contains(
+                            track
+                        )
+                    ) {
+                        searchHistory.removeAt(9)
+                        searchHistory.add(0, track)
+                        PreferencesManager.saveSearchHistory(searchHistory)
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this@SearchActivity,
+                        "А вот тут я должен крашнуться, так как плеера то нет",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        })
+
+        recViewSearch.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        recViewSearch.adapter = searchAdapter
+
+        fun showSearchHistory() {
+            searchAdapter.tracks = searchHistory
+            searchAdapter.notifyDataSetChanged()
+            youSearchedIt.visibility = View.VISIBLE
+            clearHistory.visibility = View.VISIBLE
+            searchError.visibility = View.GONE
+            recViewSearch.visibility = View.VISIBLE
+        }
+
+        fun showSearchResult() {
+            tracks.clear()
+            searchAdapter.tracks = tracks
+            recViewSearch.visibility = View.GONE
+            youSearchedIt.visibility = View.GONE
+            clearHistory.visibility = View.GONE
+            searchError.visibility = View.GONE
+        }
+
+        fun chooseData() {
+            if (searchHistory.isEmpty() || searchInput.text.isNotEmpty()) {
+                showSearchResult()
+            } else if (searchHistory.isNotEmpty()) {
+                showSearchHistory()
+            }
+        }
+        chooseData()
+
 
         if (savedInstanceState != null) {
             searchQuery = savedInstanceState.getString(KEY_SEARCH_QUERY, STR_DEF) ?: STR_DEF
             searchInput.setText(searchQuery)
 
             val tracksJson = savedInstanceState.getString(KEY_TRACKS_MEETING, "") ?: ""
-            if(tracksJson.isNotEmpty()) {
-                tracks = fromJson(tracksJson)
-                adapter.updateData(tracks)
+            if (tracksJson.isNotEmpty()) {
+                tracks = GsonClient.fromJson(tracksJson)
+                searchAdapter.updateData(tracks)
             }
         }
 
-        fun networkError(){
-            recViewSearch.visibility= View.GONE
-            searchUpdate.visibility=View.VISIBLE
+        clearHistory.setOnClickListener() {
+            searchHistory.clear()
+            PreferencesManager.clearSearchHistory()
+            showSearchResult()
+        }
+
+        fun networkError() {
+            recViewSearch.visibility = View.GONE
             searchError.visibility = View.VISIBLE
+            searchUpdate.visibility = View.VISIBLE
             errorImagePlaceholder.setImageDrawable(getDrawable(R.drawable.network_error))
             errorStatus.setText(R.string.network_error)
         }
 
-        fun tracksNotFound(){
-            recViewSearch.visibility= View.GONE
-            searchUpdate.visibility=View.GONE
+        fun tracksNotFound() {
+            recViewSearch.visibility = View.GONE
             searchError.visibility = View.VISIBLE
+            searchUpdate.visibility = View.GONE
             errorImagePlaceholder.setImageDrawable(getDrawable(R.drawable.tracks_not_found))
             errorStatus.setText(R.string.tracks_not_found)
         }
 
-        fun searchQuestion(query: String){
-            iTunesService.search(query).enqueue(object: Callback<TrackResponse>{
-                override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>){
+        fun searchQuestion(query: String) {
+            iTunesService.search(query).enqueue(object : Callback<TrackResponse> {
+                override fun onResponse(
+                    call: Call<TrackResponse>,
+                    response: Response<TrackResponse>
+                ) {
                     if (response.isSuccessful) {
                         tracks.clear()
-                        recViewSearch.visibility=View.VISIBLE
-                        searchError.visibility=View.GONE
+                        recViewSearch.visibility = View.VISIBLE
+                        searchError.visibility = View.GONE
                         if (response.body()?.results?.isNotEmpty() == true) {
                             tracks.addAll(response.body()?.results!!)
-                            adapter.updateData(tracks)
+                            searchAdapter.updateData(tracks)
                         }
-                        if (tracks.isEmpty()){
+                        if (tracks.isEmpty()) {
                             tracksNotFound()
                         }
-                    }else{
+                    } else {
                         networkError()
                     }
                 }
-                override fun onFailure(p0: Call<TrackResponse>, response: Throwable){
+
+                override fun onFailure(p0: Call<TrackResponse>, response: Throwable) {
                     networkError()
                 }
             })
@@ -128,31 +197,30 @@ class SearchActivity : AppCompatActivity() {
 
         searchInput.addTextChangedListener(simpleTextWatcher)
         searchInput.requestFocus()
-        searchInput.setOnEditorActionListener{ _, actionId, _ ->
+        searchInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                if(searchInput.text.toString().isNotEmpty()) {
+                if (searchInput.text.toString().isNotEmpty()) {
+                    showSearchResult()
                     searchQuestion(searchInput.text.toString())
-                }else {
+                } else {
                     Toast.makeText(this, getString(R.string.emptyText), Toast.LENGTH_SHORT).show()
                 }
             }
             false
         }
 
-        searchUpdate.setOnClickListener{
+        searchUpdate.setOnClickListener {
+            showSearchResult()
             searchQuestion(searchInput.text.toString())
-            searchError.visibility=View.GONE
         }
 
-        searchBack.setOnClickListener {
+        searchBack.setNavigationOnClickListener {
             finish()
         }
 
         clearButton.setOnClickListener {
             searchInput.setText(STR_DEF)
-            tracks.clear()
-            adapter.notifyDataSetChanged()
-            searchError.visibility=View.GONE
+            chooseData()
             clearButton.visibility = View.GONE
             hideKeyboard(this, clearButton)
         }
@@ -160,8 +228,8 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(KEY_SEARCH_QUERY,searchQuery)
-        val tracksJson = toJson(tracks)
+        outState.putString(KEY_SEARCH_QUERY, searchQuery)
+        val tracksJson = GsonClient.toJson(tracks)
         outState.putString(KEY_TRACKS_MEETING, tracksJson)
     }
 
@@ -172,32 +240,22 @@ class SearchActivity : AppCompatActivity() {
 
     private fun clearButtonVisibility(s: CharSequence?): Int {
         return if (s.isNullOrEmpty()) {
-        View.GONE
+            View.GONE
         } else {
-        View.VISIBLE
+            View.VISIBLE
         }
     }
 
     private fun hideKeyboard(context: Context, view: View) {
-        val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputMethodManager =
+            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-    }
-
-    private fun toJson(tracks: ArrayList<Track>): String {
-        val gson = Gson()
-        return gson.toJson(tracks)
-    }
-
-    private fun fromJson(json: String): ArrayList<Track> {
-        val gson = Gson()
-        val type = object : TypeToken<ArrayList<Track>>() {}.type
-        return gson.fromJson(json, type)
     }
 
     companion object {
         const val KEY_SEARCH_QUERY: String = "SEARCH_QUERY"
         const val STR_DEF: String = ""
         const val KEY_TRACKS_MEETING = "tracks_meeting"
+        const val MAX_COUNT_SEARCH_HISTORY = 10
     }
 }
-

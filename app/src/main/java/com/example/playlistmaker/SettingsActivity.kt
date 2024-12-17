@@ -3,7 +3,6 @@ package com.example.playlistmaker
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.FrameLayout
 import android.widget.Toolbar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -27,12 +26,14 @@ class SettingsActivity : AppCompatActivity() {
         val writeToSupport = findViewById<MaterialTextView>(R.id.writeToSupport)
         val userAgreement = findViewById<MaterialTextView>(R.id.userAgreement)
         val settingsBack = findViewById<Toolbar>(R.id.settings_back)
-        val switchTheme = findViewById<SwitchMaterial>(R.id.switchThemeSwap)
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
 
-        switchTheme.setOnClickListener{
-
+        themeSwitcher.isChecked = (applicationContext as App).darkTheme
+        themeSwitcher.setOnCheckedChangeListener { _, checked ->
+            (applicationContext as App).switchDarkTheme(checked)
+            PreferencesManager.saveThemeStatus(checked)
         }
-        settingsBack.setOnClickListener {
+        settingsBack.setNavigationOnClickListener {
             finish()
         }
         shareApp.setOnClickListener {
@@ -53,7 +54,8 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(writeToSupportIntent)
         }
         userAgreement.setOnClickListener {
-            val userAgreementIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.agreement_link)))
+            val userAgreementIntent =
+                Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.agreement_link)))
             startActivity(userAgreementIntent)
         }
     }
