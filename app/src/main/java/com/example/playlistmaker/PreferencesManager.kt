@@ -25,7 +25,7 @@ object PreferencesManager {
     }
 
     fun saveSearchHistory(history: MutableList<Track>) {
-        val json = GsonClient.toJson(history)
+        val json = GsonClient.listToJson(history)
         searchHistoryPreferences.edit().putString(HISTORY_LIST, json).apply()
     }
 
@@ -36,7 +36,7 @@ object PreferencesManager {
     fun getSearchHistory(): MutableList<Track> {
         val json = searchHistoryPreferences.getString(HISTORY_LIST, "") ?: ""
         if (json.isNotEmpty()) {
-            val trackHistory = GsonClient.fromJson(json)
+            val trackHistory = GsonClient.arrayFromJson(json)
             return trackHistory
         } else return mutableListOf<Track>()
     }

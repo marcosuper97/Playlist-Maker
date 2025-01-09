@@ -14,4 +14,8 @@
     <dimen name="padding_vertical_settings">21dp</dimen>
     <dimen name="searchedIt">52dp</dimen>
     <dimen name="size_you_searched_it">19sp</dimen>
+    <dimen name="margin_top_cover">26dp</dimen>
+    <dimen name="bottom_info_size">13sp</dimen>
+    <dimen name="player_track_name">22sp</dimen>
+    <dimen name="little_size_player">14sp</dimen>
 </resources>

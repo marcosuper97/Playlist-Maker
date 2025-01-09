@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.text.Editable
@@ -41,7 +42,7 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        val playerIntent = Intent(this, PlayerActivity::class.java)
         val searchInput = findViewById<EditText>(R.id.search_hint)
         val clearButton = findViewById<ImageView>(R.id.clearButton)
         val searchBack = findViewById<Toolbar>(R.id.search_back)
@@ -77,6 +78,9 @@ class SearchActivity : AppCompatActivity() {
                     ) {
                         searchHistory.add(0, track)
                         PreferencesManager.saveSearchHistory(searchHistory)
+                        val putTrack = GsonClient.objectToJson(track)
+                        playerIntent.putExtra("track",putTrack)
+                        startActivity(playerIntent)
                     } else if (searchHistory.count() <= MAX_COUNT_SEARCH_HISTORY && searchHistory.contains(
                             track
                         )
@@ -84,6 +88,9 @@ class SearchActivity : AppCompatActivity() {
                         searchHistory.remove(track)
                         searchHistory.add(0, track)
                         PreferencesManager.saveSearchHistory(searchHistory)
+                        val putTrack = GsonClient.objectToJson(track)
+                        playerIntent.putExtra("track",putTrack)
+                        startActivity(playerIntent)
                     } else if (searchHistory.count() == MAX_COUNT_SEARCH_HISTORY && !searchHistory.contains(
                             track
                         )
@@ -91,6 +98,9 @@ class SearchActivity : AppCompatActivity() {
                         searchHistory.removeAt(9)
                         searchHistory.add(0, track)
                         PreferencesManager.saveSearchHistory(searchHistory)
+                        val putTrack = GsonClient.objectToJson(track)
+                        playerIntent.putExtra("track",putTrack)
+                        startActivity(playerIntent)
                     }
                 } catch (e: Exception) {
                     Toast.makeText(
@@ -140,7 +150,7 @@ class SearchActivity : AppCompatActivity() {
 
             val tracksJson = savedInstanceState.getString(KEY_TRACKS_MEETING, "") ?: ""
             if (tracksJson.isNotEmpty()) {
-                tracks = GsonClient.fromJson(tracksJson)
+                tracks = GsonClient.arrayFromJson(tracksJson)
                 searchAdapter.updateData(tracks)
             }
         }
@@ -229,7 +239,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(KEY_SEARCH_QUERY, searchQuery)
-        val tracksJson = GsonClient.toJson(tracks)
+        val tracksJson = GsonClient.listToJson(tracks)
         outState.putString(KEY_TRACKS_MEETING, tracksJson)
     }
 

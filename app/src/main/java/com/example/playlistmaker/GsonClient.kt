@@ -7,12 +7,21 @@ object GsonClient {
 
     private val gson = Gson()
 
-    fun toJson(tracks: MutableList<Track>): String {
+    fun listToJson(tracks: MutableList<Track>): String {
         return gson.toJson(tracks)
     }
 
-    fun fromJson(json: String): MutableList<Track> {
+    fun objectToJson(track:Track):String{
+        return gson.toJson(track)
+    }
+
+    fun arrayFromJson(json: String): MutableList<Track> {
         val type = object : TypeToken<MutableList<Track>>() {}.type
+        return gson.fromJson(json, type)
+    }
+
+    fun objectFromJson(json: String): Track {
+        val type = object : TypeToken<Track>() {}.type
         return gson.fromJson(json, type)
     }
 }
