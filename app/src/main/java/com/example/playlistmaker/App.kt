@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.app.Application
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
 
 class App : Application() {
@@ -8,10 +9,25 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        PreferencesManager.initFirstLaunchFlag(this)
         PreferencesManager.initThemePreferences(this)
         PreferencesManager.initSearchHistory(this)
-        val darkThemeEnabled = PreferencesManager.getBoolean()
-        switchDarkTheme(darkThemeEnabled)
+
+        val isFirstLaunch = PreferencesManager.isFirstLaunch()
+
+        if (isFirstLaunch) {
+            // Определяем системную тему сегмент if будет только один раз
+            val isSystemDarkTheme = isSystemDarkThemeEnabled()
+            switchDarkTheme(isSystemDarkTheme)
+            // Сохраняем системную тему как пользовательскую настройку
+            PreferencesManager.saveThemeStatus(isSystemDarkTheme)
+            // Устанавливаем флаг, что первый запуск завершён
+            PreferencesManager.setFlag(false)
+        } else {
+            // Используем сохранённые пользовательские настройки
+            val darkThemeEnabled = PreferencesManager.getBoolean()
+            switchDarkTheme(darkThemeEnabled)
+        }
     }
 
     fun switchDarkTheme(darkThemeEnabled: Boolean) {
@@ -23,5 +39,12 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
+    }
+
+    private fun isSystemDarkThemeEnabled(): Boolean {
+        return when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+            Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
     }
 }
