@@ -34,7 +34,7 @@
             android:id="@+id/you_searched_it"
             style="@style/youSearchedIt"
             android:text="@string/you_searched_it"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
@@ -73,4 +73,9 @@
             android:layout_width="91dp"
             android:text="@string/update" />
     </LinearLayout>
+    
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="@style/progressBar"
+        android:visibility="gone"/>
 </FrameLayout>

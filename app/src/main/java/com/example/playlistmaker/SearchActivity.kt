@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -12,6 +14,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toolbar
@@ -21,17 +24,21 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class SearchActivity : AppCompatActivity() {
+
+    private val handler = Handler(Looper.getMainLooper())
     private var searchQuery: String = STR_DEF
     private val iTunesService = ItunesApiClient.tunesService
     private var tracks = mutableListOf<Track>()
     lateinit var searchHistory: MutableList<Track>
     lateinit var searchAdapter: SearchAdapter
     lateinit var searchError: View
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -42,6 +49,7 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         val playerIntent = Intent(this, PlayerActivity::class.java)
         val searchInput = findViewById<EditText>(R.id.search_hint)
         val clearButton = findViewById<ImageView>(R.id.clearButton)
@@ -53,20 +61,8 @@ class SearchActivity : AppCompatActivity() {
         val recViewSearch = findViewById<RecyclerView>(R.id.recyclerView)
         val youSearchedIt = findViewById<TextView>(R.id.you_searched_it)
         val clearHistory = findViewById<TextView>(R.id.clear_search_history)
-        val simpleTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
+        val progressBar = findViewById<ProgressBar>(R.id.progressBar)
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                clearButton.visibility = clearButtonVisibility(s)
-                if (tracks.isNotEmpty()) {
-                    clearButton.visibility = View.VISIBLE
-                }
-                searchQuery = s.toString()
-            }
-
-            override fun afterTextChanged(p0: Editable?) {}
-        }
 
         searchHistory = PreferencesManager.getSearchHistory()
         searchAdapter = SearchAdapter(object : TracksOnClickListener {
@@ -79,7 +75,7 @@ class SearchActivity : AppCompatActivity() {
                         searchHistory.add(0, track)
                         PreferencesManager.saveSearchHistory(searchHistory)
                         val putTrack = GsonClient.objectToJson(track)
-                        playerIntent.putExtra("track",putTrack)
+                        playerIntent.putExtra("track", putTrack)
                         startActivity(playerIntent)
                     } else if (searchHistory.count() <= MAX_COUNT_SEARCH_HISTORY && searchHistory.contains(
                             track
@@ -89,7 +85,7 @@ class SearchActivity : AppCompatActivity() {
                         searchHistory.add(0, track)
                         PreferencesManager.saveSearchHistory(searchHistory)
                         val putTrack = GsonClient.objectToJson(track)
-                        playerIntent.putExtra("track",putTrack)
+                        playerIntent.putExtra("track", putTrack)
                         startActivity(playerIntent)
                     } else if (searchHistory.count() == MAX_COUNT_SEARCH_HISTORY && !searchHistory.contains(
                             track
@@ -99,7 +95,7 @@ class SearchActivity : AppCompatActivity() {
                         searchHistory.add(0, track)
                         PreferencesManager.saveSearchHistory(searchHistory)
                         val putTrack = GsonClient.objectToJson(track)
-                        playerIntent.putExtra("track",putTrack)
+                        playerIntent.putExtra("track", putTrack)
                         startActivity(playerIntent)
                     }
                 } catch (e: Exception) {
@@ -183,7 +179,9 @@ class SearchActivity : AppCompatActivity() {
                     call: Call<TrackResponse>,
                     response: Response<TrackResponse>
                 ) {
+                    progressBar.visibility = View.GONE
                     if (response.isSuccessful) {
+                        progressBar.visibility = View.GONE
                         tracks.clear()
                         recViewSearch.visibility = View.VISIBLE
                         searchError.visibility = View.GONE
@@ -200,24 +198,46 @@ class SearchActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(p0: Call<TrackResponse>, response: Throwable) {
+                    progressBar.visibility = View.GONE
                     networkError()
                 }
             })
         }
 
-        searchInput.addTextChangedListener(simpleTextWatcher)
-        searchInput.requestFocus()
-        searchInput.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                if (searchInput.text.toString().isNotEmpty()) {
-                    showSearchResult()
-                    searchQuestion(searchInput.text.toString())
-                } else {
-                    Toast.makeText(this, getString(R.string.emptyText), Toast.LENGTH_SHORT).show()
+        val searchRunnable = Runnable {
+            if (searchInput.text.toString().isNotEmpty()) {
+                progressBar.visibility = View.VISIBLE
+                youSearchedIt.visibility = View.GONE
+                clearHistory.visibility = View.GONE
+                searchQuestion(searchInput.text.toString())
+            }else{
+                chooseData()
+            }
+        }
+
+        fun searchDebounce() {
+            handler.removeCallbacks(searchRunnable)
+            handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+        }
+
+        val simpleTextWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun afterTextChanged(p0: Editable?) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s != null) {
+                        clearButton.visibility = clearButtonVisibility(s)
+                        searchQuery = s.toString()
+                        searchDebounce()
                 }
             }
-            false
+
         }
+
+
+        searchInput.addTextChangedListener(simpleTextWatcher)
+
+        searchInput.requestFocus()
 
         searchUpdate.setOnClickListener {
             showSearchResult()
@@ -229,6 +249,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         clearButton.setOnClickListener {
+            progressBar.visibility = View.GONE
             searchInput.setText(STR_DEF)
             chooseData()
             clearButton.visibility = View.GONE
@@ -267,5 +288,6 @@ class SearchActivity : AppCompatActivity() {
         const val STR_DEF: String = ""
         const val KEY_TRACKS_MEETING = "tracks_meeting"
         const val MAX_COUNT_SEARCH_HISTORY = 10
+        private const val SEARCH_DEBOUNCE_DELAY = 1000L
     }
 }
