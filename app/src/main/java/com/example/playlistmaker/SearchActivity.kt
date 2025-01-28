@@ -17,6 +17,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
 import android.widget.Toolbar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +36,7 @@ class SearchActivity : AppCompatActivity() {
     private var searchQuery: String = STR_DEF
     private val iTunesService = ItunesApiClient.tunesService
     private var tracks = mutableListOf<Track>()
+    private var isClickAllowed = true
     lateinit var searchHistory: MutableList<Track>
     lateinit var searchAdapter: SearchAdapter
     lateinit var searchError: View
@@ -67,44 +69,46 @@ class SearchActivity : AppCompatActivity() {
         searchHistory = PreferencesManager.getSearchHistory()
         searchAdapter = SearchAdapter(object : TracksOnClickListener {
             override fun onItemClick(track: Track) {
-                try {
-                    if (searchHistory.count() < MAX_COUNT_SEARCH_HISTORY && !searchHistory.contains(
-                            track
-                        )
-                    ) {
-                        searchHistory.add(0, track)
-                        PreferencesManager.saveSearchHistory(searchHistory)
-                        val putTrack = GsonClient.objectToJson(track)
-                        playerIntent.putExtra("track", putTrack)
-                        startActivity(playerIntent)
-                    } else if (searchHistory.count() <= MAX_COUNT_SEARCH_HISTORY && searchHistory.contains(
-                            track
-                        )
-                    ) {
-                        searchHistory.remove(track)
-                        searchHistory.add(0, track)
-                        PreferencesManager.saveSearchHistory(searchHistory)
-                        val putTrack = GsonClient.objectToJson(track)
-                        playerIntent.putExtra("track", putTrack)
-                        startActivity(playerIntent)
-                    } else if (searchHistory.count() == MAX_COUNT_SEARCH_HISTORY && !searchHistory.contains(
-                            track
-                        )
-                    ) {
-                        searchHistory.removeAt(9)
-                        searchHistory.add(0, track)
-                        PreferencesManager.saveSearchHistory(searchHistory)
-                        val putTrack = GsonClient.objectToJson(track)
-                        playerIntent.putExtra("track", putTrack)
-                        startActivity(playerIntent)
+                if (clickDebounce()) {
+                    try {
+                        if (searchHistory.count() < MAX_COUNT_SEARCH_HISTORY && !searchHistory.contains(
+                                track
+                            )
+                        ) {
+                            searchHistory.add(0, track)
+                            PreferencesManager.saveSearchHistory(searchHistory)
+                            val putTrack = GsonClient.objectToJson(track)
+                            playerIntent.putExtra("track", putTrack)
+                            startActivity(playerIntent)
+                        } else if (searchHistory.count() <= MAX_COUNT_SEARCH_HISTORY && searchHistory.contains(
+                                track
+                            )
+                        ) {
+                            searchHistory.remove(track)
+                            searchHistory.add(0, track)
+                            PreferencesManager.saveSearchHistory(searchHistory)
+                            val putTrack = GsonClient.objectToJson(track)
+                            playerIntent.putExtra("track", putTrack)
+                            startActivity(playerIntent)
+                        } else if (searchHistory.count() == MAX_COUNT_SEARCH_HISTORY && !searchHistory.contains(
+                                track
+                            )
+                        ) {
+                            searchHistory.removeAt(9)
+                            searchHistory.add(0, track)
+                            PreferencesManager.saveSearchHistory(searchHistory)
+                            val putTrack = GsonClient.objectToJson(track)
+                            playerIntent.putExtra("track", putTrack)
+                            startActivity(playerIntent)
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            this@SearchActivity,
+                            "А вот тут я должен крашнуться, так как плеера то нет",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                } catch (e: Exception) {
-                    Toast.makeText(
-                        this@SearchActivity,
-                        "А вот тут я должен крашнуться, так как плеера то нет",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                }else Toast.makeText(this@SearchActivity,"АШЕЛАЕТЬ",LENGTH_LONG).show()
             }
         })
 
@@ -174,6 +178,10 @@ class SearchActivity : AppCompatActivity() {
         }
 
         fun searchQuestion(query: String) {
+            progressBar.visibility = View.VISIBLE
+            youSearchedIt.visibility = View.GONE
+            clearHistory.visibility = View.GONE
+            searchError.visibility = View.GONE
             iTunesService.search(query).enqueue(object : Callback<TrackResponse> {
                 override fun onResponse(
                     call: Call<TrackResponse>,
@@ -206,9 +214,7 @@ class SearchActivity : AppCompatActivity() {
 
         val searchRunnable = Runnable {
             if (searchInput.text.toString().isNotEmpty()) {
-                progressBar.visibility = View.VISIBLE
-                youSearchedIt.visibility = View.GONE
-                clearHistory.visibility = View.GONE
+                showSearchResult()
                 searchQuestion(searchInput.text.toString())
             }else{
                 chooseData()
@@ -283,11 +289,21 @@ class SearchActivity : AppCompatActivity() {
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
     companion object {
-        const val KEY_SEARCH_QUERY: String = "SEARCH_QUERY"
-        const val STR_DEF: String = ""
-        const val KEY_TRACKS_MEETING = "tracks_meeting"
-        const val MAX_COUNT_SEARCH_HISTORY = 10
-        private const val SEARCH_DEBOUNCE_DELAY = 1000L
+        private const val KEY_SEARCH_QUERY: String = "SEARCH_QUERY"
+        private const val STR_DEF: String = ""
+        private const val KEY_TRACKS_MEETING = "tracks_meeting"
+        private const val MAX_COUNT_SEARCH_HISTORY = 10
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }
