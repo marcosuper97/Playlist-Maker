@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation
 
 import android.content.Intent
 import android.net.Uri
@@ -8,35 +8,35 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.playlistmaker.App
+import com.example.playlistmaker.data.PreferencesManager
+import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySettingsBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_settings)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.settings)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        val shareApp = findViewById<MaterialTextView>(R.id.linkApp)
-        val writeToSupport = findViewById<MaterialTextView>(R.id.writeToSupport)
-        val userAgreement = findViewById<MaterialTextView>(R.id.userAgreement)
-        val settingsBack = findViewById<Toolbar>(R.id.settings_back)
-        val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
-
-        themeSwitcher.isChecked = (applicationContext as App).darkTheme
-        themeSwitcher.setOnCheckedChangeListener { _, checked ->
+        binding.themeSwitcher.isChecked = (applicationContext as App).darkTheme
+        binding.themeSwitcher.setOnCheckedChangeListener { _, checked ->
             (applicationContext as App).switchDarkTheme(checked)
             PreferencesManager.saveThemeStatus(checked)
         }
-        settingsBack.setNavigationOnClickListener {
+        binding.settingsBack.setNavigationOnClickListener {
             finish()
         }
-        shareApp.setOnClickListener {
+        binding.linkApp.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
                 putExtra(Intent.EXTRA_EMAIL, arrayOf("yourEmail@ya.ru"))
@@ -44,7 +44,7 @@ class SettingsActivity : AppCompatActivity() {
             }
             startActivity(shareIntent)
         }
-        writeToSupport.setOnClickListener {
+        binding.writeToSupport.setOnClickListener {
             val writeToSupportIntent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
                 putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_mail)))
@@ -53,7 +53,7 @@ class SettingsActivity : AppCompatActivity() {
             }
             startActivity(writeToSupportIntent)
         }
-        userAgreement.setOnClickListener {
+        binding.userAgreement.setOnClickListener {
             val userAgreementIntent =
                 Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.agreement_link)))
             startActivity(userAgreementIntent)

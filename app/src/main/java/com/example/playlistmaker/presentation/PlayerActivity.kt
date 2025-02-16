@@ -1,15 +1,12 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation
 
 import android.content.pm.ActivityInfo
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.View.GONE
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import android.widget.Toast.LENGTH_LONG
 import android.widget.Toolbar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,7 +14,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import org.w3c.dom.Text
+import com.example.playlistmaker.data.dto.GsonClient
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
