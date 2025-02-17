@@ -12,4 +12,8 @@ class TrackInteractorImpl(private val repository: TrackRepository):TrackInteract
         }
     }
 
+    override fun shutDown() {
+        executor.shutdown()
+    }
+
 }

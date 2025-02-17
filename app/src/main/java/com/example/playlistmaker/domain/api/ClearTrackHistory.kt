@@ -1,5 +1,5 @@
 package com.example.playlistmaker.domain.api
 
-interface ClearData {
+interface ClearTrackHistory {
     fun perform(){}
 }

@@ -1,22 +1,21 @@
 package com.example.playlistmaker.presentation
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.widget.Toolbar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.App
+import com.example.playlistmaker.Creator
 import com.example.playlistmaker.data.PreferencesManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
-import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
+    private val sendFeedback = Creator.getSendFeedBack()
+    private val openUserAgreement = Creator.getUserAgreement()
+    private val shareLink = Creator.getShareLink()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -37,26 +36,13 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
         binding.linkApp.setOnClickListener {
-            val shareIntent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:")
-                putExtra(Intent.EXTRA_EMAIL, arrayOf("yourEmail@ya.ru"))
-                putExtra(Intent.EXTRA_TEXT, getString(R.string.android_developerYP_page))
-            }
-            startActivity(shareIntent)
+            shareLink.action(this@SettingsActivity)
         }
         binding.writeToSupport.setOnClickListener {
-            val writeToSupportIntent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:")
-                putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_mail)))
-                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.subject_to_write_support))
-                putExtra(Intent.EXTRA_TEXT, getString(R.string.text_for_support))
-            }
-            startActivity(writeToSupportIntent)
+            sendFeedback.action(this@SettingsActivity)
         }
         binding.userAgreement.setOnClickListener {
-            val userAgreementIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.agreement_link)))
-            startActivity(userAgreementIntent)
+            openUserAgreement.action(this@SettingsActivity)
         }
     }
 }

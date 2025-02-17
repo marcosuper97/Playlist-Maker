@@ -18,12 +18,14 @@ import com.example.playlistmaker.Creator
 import com.example.playlistmaker.data.dto.GsonClient
 import com.example.playlistmaker.data.PreferencesManager
 import com.example.playlistmaker.R
+import com.example.playlistmaker.data.network.CheckNetwork
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.domain.api.TrackInteractor
 import com.example.playlistmaker.domain.api.TracksOnClickListener
 import com.example.playlistmaker.domain.models.Track
 
 class SearchActivity : AppCompatActivity() {
+    private val checkNetwork = CheckNetwork()
     private val interactor = Creator.provideTrackInteractor()
     private val handler = Handler(Looper.getMainLooper())
     private var searchQuery: String = STR_DEF
@@ -33,6 +35,12 @@ class SearchActivity : AppCompatActivity() {
     private val clearSearchHistory = Creator.clearSearchHistory()
     private lateinit var searchAdapter: SearchAdapter
     private lateinit var binding: ActivitySearchBinding
+
+    override fun onDestroy() {
+        super.onDestroy()
+        interactor.shutDown()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -82,11 +90,11 @@ class SearchActivity : AppCompatActivity() {
         binding.searchHint.addTextChangedListener(simpleTextWatcher)
         binding.searchHint.requestFocus()
         binding.searchUpdate.setOnClickListener {
-            showSearchResult()
-            searchRequest(binding.searchHint.text.toString())
+            searchDebounce()
         }
         binding.searchBack.setNavigationOnClickListener {
             finish()
+            interactor.shutDown()
         }
         binding.clearButton.setOnClickListener {
             binding.progressBar.visibility = View.GONE
@@ -98,6 +106,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun networkError() {
+        binding.youSearchedIt.visibility = View.GONE
+        binding.clearSearchHistory.visibility = View.GONE
         binding.recyclerView.visibility = View.GONE
         binding.searchPlaceholder.visibility = View.VISIBLE
         binding.searchUpdate.visibility = View.VISIBLE
@@ -112,8 +122,10 @@ class SearchActivity : AppCompatActivity() {
 
     private val searchRunnable = Runnable {
         if (binding.searchHint.text.toString().isNotEmpty()) {
-            searchRequest(binding.searchHint.text.toString())
-            showSearchResult()
+            if (checkNetwork.isInternetAvailable(this)){
+                searchRequest(binding.searchHint.text.toString())
+                showSearchResult()
+            }else networkError()
         } else {
             chooseData()
         }
@@ -153,7 +165,6 @@ class SearchActivity : AppCompatActivity() {
         interactor.searchTracks(query, object : TrackInteractor.TrackConsumer {
             override fun consume(foundTracks: List<Track>) {
                 runOnUiThread {
-                    try {
                         if (foundTracks.isNotEmpty()) {
                             binding.progressBar.visibility = View.GONE
                             searchAdapter.updateData(foundTracks)
@@ -161,9 +172,6 @@ class SearchActivity : AppCompatActivity() {
                         } else if (foundTracks.isEmpty()) {
                             tracksNotFound()
                         }
-                    } catch (e:Exception) {
-                        networkError()
-                    }
                 }
             }
         })
