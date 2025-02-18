@@ -18,14 +18,13 @@ import com.example.playlistmaker.Creator
 import com.example.playlistmaker.data.dto.GsonClient
 import com.example.playlistmaker.data.PreferencesManager
 import com.example.playlistmaker.R
-import com.example.playlistmaker.data.network.CheckNetwork
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.domain.api.TrackInteractor
 import com.example.playlistmaker.domain.api.TracksOnClickListener
 import com.example.playlistmaker.domain.models.Track
 
 class SearchActivity : AppCompatActivity() {
-    private val checkNetwork = CheckNetwork()
+    private val checkNetwork = Creator.getCheckNetwork()
     private val interactor = Creator.provideTrackInteractor()
     private val handler = Handler(Looper.getMainLooper())
     private var searchQuery: String = STR_DEF
@@ -121,13 +120,19 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private val searchRunnable = Runnable {
-        if (binding.searchHint.text.toString().isNotEmpty()) {
-            if (checkNetwork.isInternetAvailable(this)){
-                searchRequest(binding.searchHint.text.toString())
+        when {
+            searchQuery.isNotEmpty() && checkNetwork.isInternetAvailable(this) -> {
+                searchRequest(searchQuery)
                 showSearchResult()
-            }else networkError()
-        } else {
-            chooseData()
+            }
+
+            searchQuery.isNotEmpty() && !checkNetwork.isInternetAvailable(this) -> {
+                networkError()
+            }
+
+            else -> {
+                chooseData()
+            }
         }
     }
 
@@ -165,17 +170,18 @@ class SearchActivity : AppCompatActivity() {
         interactor.searchTracks(query, object : TrackInteractor.TrackConsumer {
             override fun consume(foundTracks: List<Track>) {
                 runOnUiThread {
-                        if (foundTracks.isNotEmpty()) {
-                            binding.progressBar.visibility = View.GONE
-                            searchAdapter.updateData(foundTracks)
-                            binding.recyclerView.visibility = View.VISIBLE
-                        } else if (foundTracks.isEmpty()) {
-                            tracksNotFound()
-                        }
+                    if (foundTracks.isNotEmpty()) {
+                        binding.progressBar.visibility = View.GONE
+                        searchAdapter.updateData(foundTracks)
+                        binding.recyclerView.visibility = View.VISIBLE
+                    } else if (foundTracks.isEmpty()) {
+                        tracksNotFound()
+                    }
                 }
             }
         })
     }
+
     private fun tracksNotFound() {
         binding.progressBar.visibility = View.GONE
         binding.recyclerView.visibility = View.GONE

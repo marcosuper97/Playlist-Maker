@@ -13,6 +13,7 @@ class App : Application() {
         PreferencesManager.initFirstLaunchFlag(this)
         PreferencesManager.initThemePreferences(this)
         PreferencesManager.initSearchHistory(this)
+        instance = this
 
         val isFirstLaunch = PreferencesManager.isFirstLaunch()
 
@@ -47,5 +48,9 @@ class App : Application() {
             Configuration.UI_MODE_NIGHT_YES -> true
             else -> false
         }
+    }
+    companion object {
+        lateinit var instance: App
+            private set
     }
 }

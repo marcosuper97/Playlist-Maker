@@ -7,7 +7,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.App
 import com.example.playlistmaker.Creator
-import com.example.playlistmaker.data.PreferencesManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 
@@ -16,6 +15,7 @@ class SettingsActivity : AppCompatActivity() {
     private val sendFeedback = Creator.getSendFeedBack()
     private val openUserAgreement = Creator.getUserAgreement()
     private val shareLink = Creator.getShareLink()
+    private val swapTheme = Creator.getThemeChanger()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -29,8 +29,7 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.themeSwitcher.isChecked = (applicationContext as App).darkTheme
         binding.themeSwitcher.setOnCheckedChangeListener { _, checked ->
-            (applicationContext as App).switchDarkTheme(checked)
-            PreferencesManager.saveThemeStatus(checked)
+            swapTheme.execute(checked)
         }
         binding.settingsBack.setNavigationOnClickListener {
             finish()

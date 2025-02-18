@@ -20,17 +20,20 @@ import java.util.Locale
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private var mainThreadHandler: Handler? = null
-    private lateinit var mediaPlayer:UserMediaPlayer
+    private var mediaPlayer: UserMediaPlayer? = null
+    private val playerTrack = Creator.getPlayerTrack()
+    private val trackCover = Creator.trackCover()
 
     override fun onPause() {
         super.onPause()
         mainThreadHandler?.removeCallbacksAndMessages(null)
-        mediaPlayer.pausePlayer()
+        mediaPlayer?.pausePlayer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer.release()
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,12 +49,9 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         mainThreadHandler = Handler(Looper.getMainLooper())
+        val track = playerTrack.get(intent.getStringExtra("track").toString())
         mediaPlayer = Creator.mediaPlayer()
-        val track = mediaPlayer.getTrack(intent.getStringExtra("track").toString())
-        mediaPlayer.preparePlayer(track.previewUrl)
-
-        fun getCoverArtwork() = track.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg")
-
+        mediaPlayer?.preparePlayer(track.previewUrl)
         binding.songName.text = track.trackName
         binding.executor.text = track.artistName
         binding.durationTime.text =
@@ -62,39 +62,46 @@ class PlayerActivity : AppCompatActivity() {
         binding.countryName.text = track.country
 
         Glide.with(binding.cover)
-            .load(getCoverArtwork())
+            .load(trackCover.editFormat(track.artworkUrl100))
             .placeholder(R.drawable.player_placeholder)
             .centerCrop()
             .transform(RoundedCorners(8))
             .into(binding.cover)
 
-        binding.playerBack.setOnClickListener() {
+        binding.playerBack.setOnClickListener {
             finish()
         }
-
-        binding.addButton.setOnClickListener() { }
-
-        binding.playPauseButton.setOnClickListener() {
-            mediaPlayer.playbackControl()
-            if (mediaPlayer.getStatePlayer() == STATE_PLAYING) {
+        binding.addButton.setOnClickListener { }
+        binding.playPauseButton.setOnClickListener {
+            mediaPlayer?.playbackControl()
+            if (mediaPlayer?.getStatePlayer() == STATE_PLAYING) {
                 binding.playPauseButton.setImageDrawable(getDrawable(R.drawable.button_pause))
-                mediaPlayer.playTimer()
-                mainThreadHandler?.post { timerSong }
+                mainThreadHandler?.post { songRunTime.run() }
             } else {
                 binding.playPauseButton.setImageDrawable(getDrawable(R.drawable.button_play))
             }
         }
-        binding.likeButton.setOnClickListener() { }
+        binding.likeButton.setOnClickListener { }
     }
 
-    private val timerSong = object : Runnable {
+    private fun setDefaultStatus(){
+        binding.time.text = TIME_DEF
+        binding.playPauseButton.setImageDrawable(getDrawable(R.drawable.button_play))
+    }
+
+    private val songRunTime = object : Runnable {
         override fun run() {
-            if (mediaPlayer.getStatePlayer() == STATE_PLAYING) {
-                binding.time.text = "1"
+            if (mediaPlayer?.getStatePlayer() == STATE_PLAYING) {
+                var time = mediaPlayer?.getPlayTimer()
+                binding.time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(time)
                 mainThreadHandler?.postDelayed(this, TIME_UPDATE)
             }
-            if (mediaPlayer.getStatePlayer() == STATE_PAUSED) {
+            if (mediaPlayer?.getStatePlayer() == STATE_PAUSED) {
                 mainThreadHandler?.removeCallbacks(this)
+            }
+            if (mediaPlayer?.getStatePlayer() == STATE_PREPARED)
+            {
+              setDefaultStatus()
             }
         }
     }
@@ -102,8 +109,8 @@ class PlayerActivity : AppCompatActivity() {
     companion object {
         private const val STATE_PLAYING = 2
         private const val STATE_PAUSED = 3
+        private const val STATE_PREPARED = 1
         private const val TIME_UPDATE = 500L
         private const val TIME_DEF = "00:30"
-        private const val TIME_END = "00:00"
     }
 }
