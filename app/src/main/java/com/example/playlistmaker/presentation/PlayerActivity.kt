@@ -13,14 +13,14 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
-import com.example.playlistmaker.domain.api.UserMediaPlayer
+import com.example.playlistmaker.domain.impl.PlayerInterractorImpl
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private var mainThreadHandler: Handler? = null
-    private var mediaPlayer: UserMediaPlayer? = null
+    private var mediaPlayer: PlayerInterractorImpl? = null
     private val playerTrack = Creator.getPlayerTrack()
     private val trackCover = Creator.trackCover()
 
@@ -50,7 +50,7 @@ class PlayerActivity : AppCompatActivity() {
 
         mainThreadHandler = Handler(Looper.getMainLooper())
         val track = playerTrack.get(intent.getStringExtra("track").toString())
-        mediaPlayer = Creator.mediaPlayer()
+        mediaPlayer = Creator.getPlayerInterractor()
         mediaPlayer?.preparePlayer(track.previewUrl)
         binding.songName.text = track.trackName
         binding.executor.text = track.artistName

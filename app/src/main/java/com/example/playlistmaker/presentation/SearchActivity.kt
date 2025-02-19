@@ -16,9 +16,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.Creator
 import com.example.playlistmaker.data.dto.GsonClient
-import com.example.playlistmaker.data.PreferencesManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.domain.api.StorageGetSetInterractor
+import com.example.playlistmaker.domain.api.StoreCleanerInterractor
+import com.example.playlistmaker.domain.api.StoreGetSetRepository
+import com.example.playlistmaker.domain.api.TrackHistoryReformater
 import com.example.playlistmaker.domain.api.TrackInteractor
 import com.example.playlistmaker.domain.api.TracksOnClickListener
 import com.example.playlistmaker.domain.models.Track
@@ -28,13 +31,13 @@ class SearchActivity : AppCompatActivity() {
     private val interactor = Creator.provideTrackInteractor()
     private val handler = Handler(Looper.getMainLooper())
     private var searchQuery: String = STR_DEF
-    private val searchHistory = PreferencesManager.getSearchHistory()
     private var tracks = mutableListOf<Track>()
+    lateinit var storeGetSetInteractor: StorageGetSetInterractor
     lateinit var tracksOnClickListener: TracksOnClickListener
-    private val clearSearchHistory = Creator.clearSearchHistory()
+    lateinit var searchHistory: List<Track>
+    lateinit var cleanSearchHistory: StoreCleanerInterractor
     private lateinit var searchAdapter: SearchAdapter
     private lateinit var binding: ActivitySearchBinding
-
     override fun onDestroy() {
         super.onDestroy()
         interactor.shutDown()
@@ -51,6 +54,9 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        storeGetSetInteractor = Creator.getTrackGetSetInterractor(this@SearchActivity)
+        searchHistory = storeGetSetInteractor.getSearchHistory()
+        cleanSearchHistory = Creator.getCleanStoreInterractor(storeGetSetInteractor.getPreferences())
         tracksOnClickListener = Creator.clickOnListenner(this)
         searchAdapter = SearchAdapter(tracksOnClickListener)
         binding.recyclerView.layoutManager =
@@ -69,10 +75,12 @@ class SearchActivity : AppCompatActivity() {
                 searchAdapter.updateData(tracks)
             }
         }
+
         binding.clearSearchHistory.setOnClickListener() {
-            clearSearchHistory.perform()
+            cleanSearchHistory.execute()
             showSearchResult()
         }
+
         val simpleTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun afterTextChanged(p0: Editable?) {}
@@ -84,8 +92,8 @@ class SearchActivity : AppCompatActivity() {
                     searchDebounce()
                 }
             }
-
         }
+
         binding.searchHint.addTextChangedListener(simpleTextWatcher)
         binding.searchHint.requestFocus()
         binding.searchUpdate.setOnClickListener {
@@ -137,7 +145,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun chooseData() {
-        if (searchHistory.isEmpty() || binding.searchHint.text.isNotEmpty()) {
+        if (searchHistory.isEmpty() || binding.searchHint.text.isNotEmpty()
+        ) {
             showSearchResult()
         } else if (searchHistory.isNotEmpty()) {
             showSearchHistory()

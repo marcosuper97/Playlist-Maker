@@ -12,7 +12,6 @@ class App : Application() {
         super.onCreate()
         PreferencesManager.initFirstLaunchFlag(this)
         PreferencesManager.initThemePreferences(this)
-        PreferencesManager.initSearchHistory(this)
         instance = this
 
         val isFirstLaunch = PreferencesManager.isFirstLaunch()
