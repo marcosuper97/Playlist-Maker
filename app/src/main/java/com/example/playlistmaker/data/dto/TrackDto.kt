@@ -1,11 +1,9 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.data.dto
 
 import kotlinx.serialization.Serializable
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Serializable
-data class Track(
+data class TrackDto(
     val trackName: String,
     val artistName: String,
     val trackTimeMillis: Long,

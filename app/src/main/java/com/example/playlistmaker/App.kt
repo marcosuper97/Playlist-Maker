@@ -3,6 +3,7 @@ package com.example.playlistmaker
 import android.app.Application
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.data.PreferencesManager
 
 class App : Application() {
     var darkTheme = false
@@ -11,7 +12,7 @@ class App : Application() {
         super.onCreate()
         PreferencesManager.initFirstLaunchFlag(this)
         PreferencesManager.initThemePreferences(this)
-        PreferencesManager.initSearchHistory(this)
+        instance = this
 
         val isFirstLaunch = PreferencesManager.isFirstLaunch()
 
@@ -46,5 +47,9 @@ class App : Application() {
             Configuration.UI_MODE_NIGHT_YES -> true
             else -> false
         }
+    }
+    companion object {
+        lateinit var instance: App
+            private set
     }
 }

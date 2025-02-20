@@ -1,5 +1,6 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.data.dto
 
+import com.example.playlistmaker.domain.models.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -11,7 +12,7 @@ object GsonClient {
         return gson.toJson(tracks)
     }
 
-    fun objectToJson(track:Track):String{
+    fun objectToJson(track: Track):String{
         return gson.toJson(track)
     }
 
