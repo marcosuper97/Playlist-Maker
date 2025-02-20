@@ -2,8 +2,6 @@ package com.example.playlistmaker.data
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.playlistmaker.data.dto.GsonClient
-import com.example.playlistmaker.domain.models.Track
 
 object PreferencesManager {
 

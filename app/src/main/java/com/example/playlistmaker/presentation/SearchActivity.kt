@@ -15,13 +15,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.Creator
-import com.example.playlistmaker.data.dto.GsonClient
 import com.example.playlistmaker.R
+import com.example.playlistmaker.data.dto.GsonClient
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.domain.api.StorageGetSetInterractor
 import com.example.playlistmaker.domain.api.StoreCleanerInterractor
-import com.example.playlistmaker.domain.api.StoreGetSetRepository
-import com.example.playlistmaker.domain.api.TrackHistoryReformater
 import com.example.playlistmaker.domain.api.TrackInteractor
 import com.example.playlistmaker.domain.api.TracksOnClickListener
 import com.example.playlistmaker.domain.models.Track
@@ -56,7 +54,8 @@ class SearchActivity : AppCompatActivity() {
         }
         storeGetSetInteractor = Creator.getTrackGetSetInterractor(this@SearchActivity)
         searchHistory = storeGetSetInteractor.getSearchHistory()
-        cleanSearchHistory = Creator.getCleanStoreInterractor(storeGetSetInteractor.getPreferences())
+        cleanSearchHistory =
+            Creator.getCleanStoreInterractor(storeGetSetInteractor.getPreferences())
         tracksOnClickListener = Creator.clickOnListenner(this)
         searchAdapter = SearchAdapter(tracksOnClickListener)
         binding.recyclerView.layoutManager =
