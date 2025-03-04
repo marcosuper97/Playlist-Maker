@@ -4,10 +4,9 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import com.example.playlistmaker.data.NetworkChecking
 
-class NetworkAvailable:NetworkChecking {
-    override fun isInternetAvailable(context: Context): Boolean {
+class NetworkAvailable(private val context: Context): NetworkChecking {
+    override fun isInternetAvailable(): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
