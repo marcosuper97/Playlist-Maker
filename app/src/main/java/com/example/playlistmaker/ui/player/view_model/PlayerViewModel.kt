@@ -97,6 +97,16 @@ class PlayerViewModel(
         }
     }
 
+    fun activityOnPause(){
+        if (mediaPlayer?.getStatePlayer() == STATE_PLAYING) {
+            _playerStateUi.postValue(
+                PlayerStateUi.Pause(playerTrack.getWithoutCallback(trackJson))
+            )
+            mediaPlayer?.pauseMusic()
+            stopTimer()
+        }
+    }
+
     companion object {
         private const val STATE_PLAYING = 2
         private const val STATE_PAUSED = 3

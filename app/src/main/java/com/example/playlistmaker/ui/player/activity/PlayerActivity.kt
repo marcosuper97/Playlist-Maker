@@ -19,6 +19,10 @@ import java.util.Locale
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var viewModel: PlayerViewModel
+    override fun onPause() {
+        super.onPause()
+        viewModel.activityOnPause()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +69,7 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         binding.playPauseButton.setOnClickListener {
-                viewModel.onClickPlayMusic()
+            viewModel.onClickPlayMusic()
         }
     }
 
