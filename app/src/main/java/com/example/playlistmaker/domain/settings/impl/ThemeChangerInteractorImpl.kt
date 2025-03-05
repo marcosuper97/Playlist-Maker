@@ -7,4 +7,8 @@ class ThemeChangerInteractorImpl(private val themeChangerRepository: ThemeChange
     override fun changeTheme(themeStatus:Boolean) {
         themeChangerRepository.switchTheme(themeStatus)
     }
+
+    override fun getThemeStatus(): Boolean {
+        return themeChangerRepository.getThemeStatus()
+    }
 }

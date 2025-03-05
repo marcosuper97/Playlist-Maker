@@ -71,7 +71,7 @@ class App : Application() {
         darkThemePreferences.edit().putBoolean(DARK_THEME, value).apply()
     }
 
-    private fun getThemeStatus(): Boolean {
+    fun getThemeStatus(): Boolean {
         return darkThemePreferences.getBoolean(DARK_THEME, false)
     }
     companion object {

@@ -8,9 +8,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
-import com.example.playlistmaker.domain.settings.SettingsEvent
 import com.example.playlistmaker.ui.settings.view_model.SettingsViewModel
-import com.example.playlistmaker.util.App
+import com.example.playlistmaker.util.Creator
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -29,38 +28,15 @@ class SettingsActivity : AppCompatActivity() {
         }
         viewModel = ViewModelProvider(
             this,
-            SettingsViewModel.getViewModelFactory()
+            SettingsViewModel.getViewModelFactory(Creator.getSharingInteractor(this),Creator.getThemeChangerInteractor())
         )[SettingsViewModel::class.java]
 
-        binding.themeSwitcher.isChecked = (applicationContext as App).darkTheme
-
-        viewModel.settingsEvent.observe(this) { event ->
-            when (event) {
-                SettingsEvent.OpenSupport -> {
-                    viewModel.sharingInteractor.openSupport(this)
-                }
-
-                SettingsEvent.OpenTerms -> {
-                    viewModel.sharingInteractor.openTerms(this)
-                }
-
-                SettingsEvent.ShareApp -> {
-                    viewModel.sharingInteractor.shareApp(this)
-                }
-
-                SettingsEvent.SwapTheme -> {
-                    if (binding.themeSwitcher.isChecked) {
-                        viewModel.themeChangerInteractor.changeTheme(true)
-                    }
-                    else {
-                        viewModel.themeChangerInteractor.changeTheme(false)
-                    }
-                }
-            }
+        viewModel.changeTheme.observe(this) { isEnabled ->
+            binding.themeSwitcher.isChecked = isEnabled
         }
 
-        binding.themeSwitcher.setOnCheckedChangeListener { _, _ ->
-            viewModel.onChangeThemeClicked()
+        binding.themeSwitcher.setOnCheckedChangeListener { _, check ->
+            viewModel.onChangeThemeClicked(check)
         }
 
         binding.settingsBack.setNavigationOnClickListener {

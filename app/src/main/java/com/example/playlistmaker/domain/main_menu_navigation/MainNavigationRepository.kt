@@ -1,8 +1,6 @@
 package com.example.playlistmaker.domain.main_menu_navigation
 
-import android.content.Context
-
-interface MainNavigationInteractor {
+interface MainNavigationRepository {
     fun settings()
     fun library()
     fun search()

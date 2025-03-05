@@ -5,8 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import com.example.playlistmaker.data.sharing.SharingRepository
 
-class SharingRepositoryImpl() : SharingRepository {
-    override fun openSupport(context: Context) {
+class SharingRepositoryImpl(private val contextActivity: Context) : SharingRepository {
+    override fun openSupport() {
         val writeToSupportIntent = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:")
             putExtra(Intent.EXTRA_EMAIL, arrayOf("gorpishin97@yandex.ru"))
@@ -19,21 +19,21 @@ class SharingRepositoryImpl() : SharingRepository {
                 "Спасибо разработчикам и разработчицам за крутое приложение!"
             )
         }
-        context.startActivity(writeToSupportIntent)
+        contextActivity.startActivity(writeToSupportIntent)
     }
 
-    override fun openTerms(context: Context) {
+    override fun openTerms() {
         val userAgreementIntent =
             Intent(Intent.ACTION_VIEW, Uri.parse("https://yandex.ru/legal/practicum_offer/"))
-        context.startActivity(userAgreementIntent)
+        contextActivity.startActivity(userAgreementIntent)
     }
 
-    override fun shareApp(context: Context) {
+    override fun shareApp() {
         val shareApp = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:")
             putExtra(Intent.EXTRA_EMAIL, arrayOf("yourEmail@ya.ru"))
             putExtra(Intent.EXTRA_TEXT, "https://practicum.yandex.ru/android-developer/")
         }
-        context.startActivity(shareApp)
+        contextActivity.startActivity(shareApp)
     }
 }

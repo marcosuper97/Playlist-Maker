@@ -8,8 +8,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityMainBinding
-import com.example.playlistmaker.domain.main_menu_navigation.Navigation
 import com.example.playlistmaker.ui.main.view_model.MainViewModel
+import com.example.playlistmaker.util.Creator
 
 class MainActivity : AppCompatActivity(){
 
@@ -29,24 +29,8 @@ class MainActivity : AppCompatActivity(){
 
         viewModel = ViewModelProvider(
             this,
-            MainViewModel.getViewModelFactory()
+            MainViewModel.getViewModelFactory(Creator.getMainNavigationInteractor(this))
         )[MainViewModel::class.java]
-
-        viewModel.navigate.observe(this) { state ->
-            when (state){
-                is Navigation.Settings ->{
-                    viewModel.navigationInteractor.settings(this)
-                }
-
-                is Navigation.Search ->{
-                    viewModel.navigationInteractor.search(this)
-                }
-
-                is Navigation.Library ->{
-                    viewModel.navigationInteractor.library(this)
-                }
-            }
-        }
 
         binding.searchButton.setOnClickListener {
             viewModel.onCLickSearch()

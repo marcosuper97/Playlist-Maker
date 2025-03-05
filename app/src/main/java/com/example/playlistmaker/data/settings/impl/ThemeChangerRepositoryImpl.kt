@@ -10,4 +10,8 @@ class ThemeChangerRepositoryImpl(): ThemeChangerRepository {
     override fun switchTheme(themeStatus: Boolean) {
         app.switchDarkTheme(themeStatus)
     }
+
+    override fun getThemeStatus(): Boolean {
+        return app.getThemeStatus()
+    }
 }
