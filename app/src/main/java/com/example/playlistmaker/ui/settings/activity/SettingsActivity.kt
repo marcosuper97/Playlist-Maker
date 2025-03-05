@@ -8,6 +8,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import com.example.playlistmaker.domain.settings.SettingsEvent
 import com.example.playlistmaker.ui.settings.view_model.SettingsViewModel
 import com.example.playlistmaker.util.Creator
 
@@ -31,12 +32,21 @@ class SettingsActivity : AppCompatActivity() {
             SettingsViewModel.getViewModelFactory(Creator.getSharingInteractor(this),Creator.getThemeChangerInteractor())
         )[SettingsViewModel::class.java]
 
-        viewModel.changeTheme.observe(this) { isEnabled ->
-            binding.themeSwitcher.isChecked = isEnabled
+        viewModel.settingsEvent.observe(this){event ->
+            when (event){
+                SettingsEvent.OpenSupport -> viewModel.supportEvent()
+                SettingsEvent.OpenTerms -> viewModel.termsEvent()
+                SettingsEvent.ShareApp -> viewModel.shareAppEvent()
+                is SettingsEvent.SwapTheme -> {
+                    binding.themeSwitcher.isChecked = event.boolean
+                    viewModel.changeThemeEvent(event.boolean)
+
+                }
+            }
         }
 
         binding.themeSwitcher.setOnCheckedChangeListener { _, check ->
-            viewModel.onChangeThemeClicked(check)
+            viewModel.clickOnChangeTheme(check)
         }
 
         binding.settingsBack.setNavigationOnClickListener {
@@ -44,15 +54,15 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.linkApp.setOnClickListener {
-            viewModel.onShareAppClicked()
+            viewModel.clickOnShareApp()
         }
 
         binding.writeToSupport.setOnClickListener {
-            viewModel.onSupportClicked()
+            viewModel.clickOnSupport()
         }
 
         binding.userAgreement.setOnClickListener {
-            viewModel.onTermsClicked()
+            viewModel.clickOnTerms()
         }
     }
 }
