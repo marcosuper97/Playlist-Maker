@@ -1,9 +1,9 @@
-package com.example.playlistmaker.data.search
+package com.example.playlistmaker.data.search.impl
 
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.playlistmaker.data.dto.GsonClient
-import com.example.playlistmaker.domain.search.StoreGetSetRepository
+import com.example.playlistmaker.data.search.StoreGetSetRepository
 import com.example.playlistmaker.domain.models.Track
 
 class StoreGetSetRepositoryImpl(context: Context) : StoreGetSetRepository {

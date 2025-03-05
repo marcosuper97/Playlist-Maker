@@ -5,10 +5,10 @@ import com.example.playlistmaker.data.main_menu_navigation.MainNavigationReposit
 import com.example.playlistmaker.data.network.NetworkAvailable
 import com.example.playlistmaker.data.network.NetworkChecking
 import com.example.playlistmaker.data.network.RetrofitNetworkClient
-import com.example.playlistmaker.data.search.StorageGetSetInterractorImpl
-import com.example.playlistmaker.data.search.StoreCleanerRepositoryImpl
-import com.example.playlistmaker.data.search.StoreGetSetRepositoryImpl
-import com.example.playlistmaker.data.search.TrackRepositoryImpl
+import com.example.playlistmaker.data.search.impl.StorageGetSetInterractorImpl
+import com.example.playlistmaker.data.search.impl.StoreCleanerRepositoryImpl
+import com.example.playlistmaker.data.search.impl.StoreGetSetRepositoryImpl
+import com.example.playlistmaker.data.search.impl.TrackRepositoryImpl
 import com.example.playlistmaker.data.settings.ThemeChangerRepository
 import com.example.playlistmaker.data.settings.impl.ThemeChangerRepositoryImpl
 import com.example.playlistmaker.data.sharing.SharingRepository
@@ -21,19 +21,18 @@ import com.example.playlistmaker.domain.player.impl.GetPlayerTrackImpl
 import com.example.playlistmaker.domain.player.impl.PlayerInterractorImpl
 import com.example.playlistmaker.data.player.impl.UserMediaPlayerImpl
 import com.example.playlistmaker.domain.main_menu_navigation.MainNavigationRepository
-import com.example.playlistmaker.domain.search.SearchTrackRepository
+import com.example.playlistmaker.data.search.SearchTrackRepository
 import com.example.playlistmaker.domain.search.StorageGetSetInterractor
 import com.example.playlistmaker.domain.search.StoreCleanerInterractor
-import com.example.playlistmaker.domain.search.StoreCleanerRepository
-import com.example.playlistmaker.domain.search.StoreGetSetRepository
+import com.example.playlistmaker.data.search.StoreCleanerRepository
+import com.example.playlistmaker.data.search.StoreGetSetRepository
 import com.example.playlistmaker.domain.search.TrackInteractor
-import com.example.playlistmaker.domain.search.impl.StorageCleanerInterractorImpl
+import com.example.playlistmaker.data.search.impl.StorageCleanerInterractorImpl
 import com.example.playlistmaker.domain.search.impl.TrackInteractorImpl
 import com.example.playlistmaker.domain.settings.ThemeChangerInteractor
 import com.example.playlistmaker.domain.settings.impl.ThemeChangerInteractorImpl
 import com.example.playlistmaker.domain.shairing.SharingInteractor
 import com.example.playlistmaker.domain.shairing.impl.SharingInteractorImpl
-import kotlin.contracts.contract
 
 object Creator {
 

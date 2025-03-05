@@ -1,9 +1,9 @@
-package com.example.playlistmaker.data.search
+package com.example.playlistmaker.data.search.impl
 
 import android.content.SharedPreferences
+import com.example.playlistmaker.data.search.StoreGetSetRepository
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.search.StorageGetSetInterractor
-import com.example.playlistmaker.domain.search.StoreGetSetRepository
 
 class StorageGetSetInterractorImpl(private val storeGetSetRepository: StoreGetSetRepository) :
     StorageGetSetInterractor {
