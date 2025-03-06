@@ -12,7 +12,7 @@ object GsonClient {
         return gson.toJson(tracks)
     }
 
-    fun objectToJson(track: Track):String{
+    fun objectToJson(track: Track): String {
         return gson.toJson(track)
     }
 
@@ -21,8 +21,11 @@ object GsonClient {
         return gson.fromJson(json, type)
     }
 
-    fun objectFromJson(json: String): Track {
+    fun fromJsonToPlayer(json: String): Track {
+        json.replaceAfterLast('/', FORMAT_SIZE)
         val type = object : TypeToken<Track>() {}.type
         return gson.fromJson(json, type)
     }
+
+    private const val FORMAT_SIZE = "512x512bb.jpg"
 }
