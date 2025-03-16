@@ -5,17 +5,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import com.example.playlistmaker.domain.settings.SettingsEvent
 import com.example.playlistmaker.ui.settings.view_model.SettingsViewModel
-import com.example.playlistmaker.util.Creator
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
-    private lateinit var viewModel: SettingsViewModel
+    private val viewModel: SettingsViewModel by viewModel{ parametersOf(this@SettingsActivity) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,10 +27,6 @@ class SettingsActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        viewModel = ViewModelProvider(
-            this,
-            SettingsViewModel.getViewModelFactory(Creator.getSharingInteractor(this),Creator.getThemeChangerInteractor())
-        )[SettingsViewModel::class.java]
 
         viewModel.settingsEvent.observe(this){event ->
             when (event){

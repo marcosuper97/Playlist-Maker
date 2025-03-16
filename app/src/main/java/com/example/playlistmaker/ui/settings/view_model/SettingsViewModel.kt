@@ -54,18 +54,4 @@ class SettingsViewModel(
     fun clickOnChangeTheme(check:Boolean){
         _settingsEvent.postValue(SettingsEvent.SwapTheme(check))
     }
-
-    companion object {
-        fun getViewModelFactory(
-            sharingInteractor: SharingInteractor,
-            themeChangerInteractor: ThemeChangerInteractor
-        ): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SettingsViewModel(
-                    sharingInteractor,
-                    themeChangerInteractor,
-                )
-            }
-        }
-    }
 }

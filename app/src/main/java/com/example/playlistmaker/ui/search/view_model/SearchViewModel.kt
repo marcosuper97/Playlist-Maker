@@ -3,21 +3,18 @@ package com.example.playlistmaker.ui.search.view_model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.data.network.NetworkChecking
 import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.domain.network.NetworkCheckingInteractor
 import com.example.playlistmaker.domain.search.State
 import com.example.playlistmaker.domain.search.StorageGetSetInterractor
 import com.example.playlistmaker.domain.search.StoreCleanerInterractor
-import com.example.playlistmaker.domain.search.TrackInteractor
+import com.example.playlistmaker.domain.search.SearchTrackInteractor
 
 class SearchViewModel(
     private val storeGetSetInterractor: StorageGetSetInterractor,
     private var cleanSearchHistory: StoreCleanerInterractor?,
-    private var checking: NetworkChecking?,
-    private var trackSearchInteractor: TrackInteractor?,
+    private var checking: NetworkCheckingInteractor?,
+    private var trackSearchInteractor: SearchTrackInteractor?,
 ) : ViewModel() {
 
     override fun onCleared() {
@@ -49,14 +46,14 @@ class SearchViewModel(
     }
 
     fun onClickSearchClear(){
-        storeGetSetInterractor?.getPreferences()?.let { cleanSearchHistory?.execute(it) }
+        storeGetSetInterractor?.getPreferences()?.let { cleanSearchHistory?.execute() }
         _screenState.postValue(State.EmptyScreen)
     }
 
     fun toSearchRequest(query: String){
         if(checking?.isInternetAvailable() == true){
             _screenState.postValue(State.Loading)
-            trackSearchInteractor?.searchTracks(query, object : TrackInteractor.TrackConsumer {
+            trackSearchInteractor?.searchTracks(query, object : SearchTrackInteractor.TrackConsumer {
                 override fun consume(foundTracks: List<Track>) {
                     if (foundTracks.isNotEmpty()) {
                         _screenState.postValue(State.ShowSearchContent(foundTracks))
@@ -67,23 +64,5 @@ class SearchViewModel(
             }
             )
         }else _screenState.postValue(State.NetworkError)
-    }
-
-    companion object {
-        fun getViewModelFactory(
-            storeGetSetInterractor: StorageGetSetInterractor,
-            cleanSearchHistory: StoreCleanerInterractor?,
-            checking: NetworkChecking?,
-            trackSearchInteractor: TrackInteractor?,
-        ): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SearchViewModel(
-                    storeGetSetInterractor,
-                    cleanSearchHistory,
-                    checking,
-                    trackSearchInteractor,
-                )
-            }
-        }
     }
 }

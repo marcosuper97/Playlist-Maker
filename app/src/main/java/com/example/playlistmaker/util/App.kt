@@ -5,6 +5,12 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.di.dataModule
+import com.example.playlistmaker.di.interactorModule
+import com.example.playlistmaker.di.repositoryModule
+import com.example.playlistmaker.di.viewModel
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 
 class App : Application() {
     var darkTheme = false
@@ -20,6 +26,10 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        startKoin{
+            androidContext(this@App)
+            modules(dataModule, interactorModule, repositoryModule, viewModel)
+        }
 
         instance = this
 
@@ -74,6 +84,7 @@ class App : Application() {
     fun getThemeStatus(): Boolean {
         return darkThemePreferences.getBoolean(DARK_THEME, false)
     }
+
     companion object {
         lateinit var instance: App
             private set

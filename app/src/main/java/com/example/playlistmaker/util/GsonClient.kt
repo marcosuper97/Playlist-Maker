@@ -1,4 +1,4 @@
-package com.example.playlistmaker.data.dto
+package com.example.playlistmaker.util
 
 import com.example.playlistmaker.domain.models.Track
 import com.google.gson.Gson
