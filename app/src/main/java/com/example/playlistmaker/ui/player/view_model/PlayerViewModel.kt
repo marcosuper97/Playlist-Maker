@@ -73,12 +73,8 @@ class PlayerViewModel(
                     onTick(formattedTime)
                     handler.postDelayed(this, INTERVAL)
                 } else {
-                    if (actualTime == 0) {
-                        handler.postDelayed(this, 100) // Повторить через 100 мс, если данные старые
-                    } else {
-                        onTick("00:30")  // Точно закончилась песня
-                        handler.removeCallbacks(this)
-                    }
+                    onTick("00:30")
+                    handler.removeCallbacks(this)
                 }
             }
         }
