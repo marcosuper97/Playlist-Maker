@@ -1,15 +1,11 @@
 package com.example.playlistmaker.data.search.impl
 
-import android.content.Context
 import android.content.SharedPreferences
-import com.example.playlistmaker.data.dto.GsonClient
 import com.example.playlistmaker.data.search.StoreGetSetRepository
 import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.util.GsonClient
 
-class StoreGetSetRepositoryImpl(context: Context) : StoreGetSetRepository {
-
-    private val searchHistoryPreferences =
-        context.getSharedPreferences(HISTORY_PREFERENCES, Context.MODE_PRIVATE)
+class StoreGetSetRepositoryImpl(private val searchHistoryPreferences: SharedPreferences) : StoreGetSetRepository {
 
     override fun saveTrackInHistory(track: Track) {
         val searchHistory = getSearchHistory().apply {
@@ -18,11 +14,11 @@ class StoreGetSetRepositoryImpl(context: Context) : StoreGetSetRepository {
             if (size > MAX_COUNT_SEARCH_HISTORY) removeAt(size - 1)
         }
         val json = GsonClient.listToJson(searchHistory)
-        searchHistoryPreferences.edit().putString(HISTORY_LIST, json).apply()
+        searchHistoryPreferences.edit().putString(HISTORY_PREFERENCES_KEY, json).apply()
     }
 
     override fun getSearchHistory(): MutableList<Track> {
-        val json = searchHistoryPreferences.getString(HISTORY_LIST, "") ?: ""
+        val json = searchHistoryPreferences.getString(HISTORY_PREFERENCES_KEY, "") ?: ""
         if (json.isNotEmpty()) {
             val trackHistory = GsonClient.arrayFromJson(json)
             return trackHistory
@@ -34,8 +30,7 @@ class StoreGetSetRepositoryImpl(context: Context) : StoreGetSetRepository {
     }
 
     companion object {
-        private const val HISTORY_PREFERENCES = "history_preferences"
-        private const val HISTORY_LIST = "history_list"
+        const val HISTORY_PREFERENCES_KEY = "history_list"
         private const val MAX_COUNT_SEARCH_HISTORY = 10
     }
 }

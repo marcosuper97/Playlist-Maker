@@ -5,7 +5,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
@@ -13,15 +12,16 @@ import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.player.PlayerStateUi
 import com.example.playlistmaker.ui.player.view_model.PlayerViewModel
+import org.koin.androidx.viewmodel.ext.android.getViewModel
+import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
-    private lateinit var viewModel: PlayerViewModel
-    override fun onPause() {
-        super.onPause()
-        viewModel.activityOnPause()
+    private val viewModel: PlayerViewModel by lazy {
+            val trackToJson = intent.getStringExtra("track")
+            getViewModel { parametersOf(trackToJson) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,15 +35,6 @@ class PlayerActivity : AppCompatActivity() {
             insets
         }
 
-        viewModel = ViewModelProvider(
-            this,
-            PlayerViewModel.getViewModelFactory(intent.getStringExtra("track").toString())
-        )[PlayerViewModel::class.java]
-
-        viewModel.timer.observe(this) { time ->
-            binding.time.text = time
-        }
-
         viewModel.playerStateUi.observe(this) { state ->
             when (state) {
                 is PlayerStateUi.Pause -> {
@@ -53,6 +44,7 @@ class PlayerActivity : AppCompatActivity() {
 
                 is PlayerStateUi.Play -> {
                     showUi(state.track)
+                    binding.time.text = state.time
                     binding.playPauseButton.setImageDrawable(getDrawable(R.drawable.button_pause))
                 }
 
@@ -71,6 +63,11 @@ class PlayerActivity : AppCompatActivity() {
         binding.playPauseButton.setOnClickListener {
             viewModel.onClickPlayMusic()
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.activityOnPause()
     }
 
     private fun showUi(track: Track) {

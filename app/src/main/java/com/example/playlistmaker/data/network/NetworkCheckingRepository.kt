@@ -1,7 +1,5 @@
 package com.example.playlistmaker.data.network
 
-import android.content.Context
-
-interface NetworkChecking {
+interface NetworkCheckingRepository {
     fun isInternetAvailable(): Boolean
 }

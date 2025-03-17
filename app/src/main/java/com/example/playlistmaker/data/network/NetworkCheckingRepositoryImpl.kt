@@ -5,7 +5,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 
-class NetworkAvailable(private val context: Context): NetworkChecking {
+class NetworkCheckingRepositoryImpl(private val context: Context): NetworkCheckingRepository {
     override fun isInternetAvailable(): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 

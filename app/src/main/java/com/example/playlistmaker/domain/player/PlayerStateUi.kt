@@ -6,6 +6,6 @@ sealed class PlayerStateUi {
     data class ReadyToPlay(
         val track: Track
     ) : PlayerStateUi()
-    data class Play(val track: Track) : PlayerStateUi()
+    data class Play(val track: Track, val time: String) : PlayerStateUi()
     data class Pause(val track: Track) : PlayerStateUi()
 }

@@ -6,7 +6,7 @@ import com.example.playlistmaker.data.dto.TrackSearchResponse
 import com.example.playlistmaker.data.search.SearchTrackRepository
 import com.example.playlistmaker.domain.models.Track
 
-class TrackRepositoryImpl(private val networkClient: NetworkClient) : SearchTrackRepository {
+class SearchTrackRepositoryImpl(private val networkClient: NetworkClient) : SearchTrackRepository {
     override fun searchTracks(expression: String): List<Track> {
         var response = networkClient.doRequest(TrackSearchRequest(expression))
         if (response.resultCode == 200 && response is TrackSearchResponse) {

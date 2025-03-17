@@ -1,21 +1,25 @@
-package com.example.playlistmaker.domain.player
+package com.example.playlistmaker.data.player
 
 import androidx.lifecycle.LiveData
 import com.example.playlistmaker.util.MediaPlayerState
 
-interface PlayerInterractor {
+
+interface UserMediaPlayerRepository {
 
     val mediaPlayerState: LiveData<MediaPlayerState>
 
-    fun getPlayTimer(): Int
+    fun pauseMusic()
+
+    fun playMusic()
 
     fun playbackControl()
 
     fun preparePlayer(trackPreviewUrl: String)
 
-    fun release()
+    fun release() {}
 
-    fun startMusic()
+    fun getPlayTimer():Int
 
-    fun pauseMusic()
+    fun reset()
+
 }

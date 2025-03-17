@@ -5,61 +5,69 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.domain.player.GetPlayerTrack
+import com.example.playlistmaker.domain.player.GetTrackInteractor
+import com.example.playlistmaker.domain.player.PlayerInterractor
 import com.example.playlistmaker.domain.player.PlayerStateUi
-import com.example.playlistmaker.domain.player.impl.PlayerInterractorImpl
-import com.example.playlistmaker.util.Creator
+import com.example.playlistmaker.util.MediaPlayerState
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlayerViewModel(
     private val trackJson: String,
-    private var mediaPlayer: PlayerInterractorImpl?,
-    private val playerTrack: GetPlayerTrack,
+    private var mediaPlayer: PlayerInterractor?,
+    private val playerTrack: GetTrackInteractor,
 ) : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         mediaPlayer?.release()
-        mediaPlayer = null
         handler.removeCallbacksAndMessages(null)
     }
 
+    private val trackToPlay = playerTrack.getWithoutCallback(trackJson)
     private val handler: Handler by lazy { Handler(Looper.getMainLooper()) }
+
     private val _playerStateUi = MutableLiveData<PlayerStateUi>()
     val playerStateUi: LiveData<PlayerStateUi> get() = _playerStateUi
 
-    private val _timer = MutableLiveData<String>()
-    val timer: LiveData<String> get() = _timer
-
     init {
-        playerTrack.get(trackJson,
-            onComplete = { track ->
-                _playerStateUi.postValue(
-                    PlayerStateUi.ReadyToPlay(track)
-                )
-                mediaPlayer?.preparePlayer(track.previewUrl)
-                mediaPlayer?.setOnCompletionListener {
+
+        mediaPlayer?.mediaPlayerState?.observeForever { state ->
+            when (state) {
+                MediaPlayerState.Default -> {
+                    playerTrack.get(trackJson,
+                        onComplete = { track ->
+                            mediaPlayer?.preparePlayer(track.previewUrl)
+                        }
+                    )
+                }
+
+                MediaPlayerState.Paused -> stopTimer()
+
+                MediaPlayerState.Playing -> {
+                    startTimer() { onTick ->
+                        _playerStateUi.postValue(
+                            PlayerStateUi.Play(trackToPlay, onTick)
+                        )
+                    }
+                }
+
+                MediaPlayerState.Prepared -> {
+                    handler.removeCallbacksAndMessages(null)
                     _playerStateUi.postValue(
                         PlayerStateUi.ReadyToPlay(
-                            playerTrack.getWithoutCallback(
-                                trackJson
-                            )
+                            trackToPlay
                         )
                     )
                 }
             }
-        )
+        }
     }
-
 
     private fun startTimer(onTick: (String) -> Unit) {
         val runnable = object : Runnable {
             override fun run() {
                 val actualTime = mediaPlayer?.getPlayTimer()
-                if (actualTime!! > 0) {
+                if (actualTime != null && actualTime > 0) {
                     val formattedTime = SimpleDateFormat("mm:ss", Locale.getDefault())
                         .format(actualTime)
                     onTick(formattedTime)
@@ -70,60 +78,25 @@ class PlayerViewModel(
                 }
             }
         }
-        if(mediaPlayer?.getStatePlayer() == STATE_PLAYING) {
-            handler.post(runnable)
-        }
+        handler.post(runnable)
     }
 
     private fun stopTimer() {
+        _playerStateUi.postValue(PlayerStateUi.Pause(trackToPlay))
         handler.removeCallbacksAndMessages(null)
     }
 
     fun onClickPlayMusic() {
-        if (mediaPlayer?.getStatePlayer() == STATE_PREPARED || mediaPlayer?.getStatePlayer() == STATE_PAUSED) {
-            _playerStateUi.postValue(
-                PlayerStateUi.Play(playerTrack.getWithoutCallback(trackJson))
-            )
-            mediaPlayer?.startMusic()
-            startTimer() { onTick ->
-                _timer.postValue(onTick)
-            }
-        } else if (mediaPlayer?.getStatePlayer() == STATE_PLAYING) {
-            _playerStateUi.postValue(
-                PlayerStateUi.Pause(playerTrack.getWithoutCallback(trackJson))
-            )
-            mediaPlayer?.pauseMusic()
-            stopTimer()
-        }
+        mediaPlayer?.playbackControl()
     }
 
-    fun activityOnPause(){
-        if (mediaPlayer?.getStatePlayer() == STATE_PLAYING) {
-            _playerStateUi.postValue(
-                PlayerStateUi.Pause(playerTrack.getWithoutCallback(trackJson))
-            )
+    fun activityOnPause() {
+        if (mediaPlayer?.mediaPlayerState?.value == MediaPlayerState.Playing) {
             mediaPlayer?.pauseMusic()
-            stopTimer()
         }
     }
 
     companion object {
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-        private const val STATE_PREPARED = 1
         private const val INTERVAL: Long = 1000L
-
-        fun getViewModelFactory(trackId: String): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val interactor = Creator.getPlayerInterractor()
-                val trackPlayer = Creator.getPlayerTrack()
-
-                PlayerViewModel(
-                    trackId,
-                    interactor,
-                    trackPlayer,
-                )
-            }
-        }
     }
 }

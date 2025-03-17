@@ -13,23 +13,23 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
-import com.example.playlistmaker.data.dto.GsonClient
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.search.State
 import com.example.playlistmaker.ui.player.activity.PlayerActivity
 import com.example.playlistmaker.ui.search.view_model.SearchViewModel
-import com.example.playlistmaker.util.Creator
+import com.example.playlistmaker.util.GsonClient
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class SearchActivity : AppCompatActivity() {
     private val handler: Handler by lazy { Handler(Looper.getMainLooper()) }
     private var searchQuery: String = STR_DEF
     private lateinit var searchAdapter: SearchAdapter
     private lateinit var binding: ActivitySearchBinding
-    private lateinit var viewModel: SearchViewModel
+    private val viewModel: SearchViewModel by viewModel{ parametersOf(this@SearchActivity) }
     private val playerIntent: Intent by lazy {
         Intent(this, PlayerActivity::class.java)
     }
@@ -44,16 +44,6 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        viewModel = ViewModelProvider(
-            this,
-            SearchViewModel.getViewModelFactory(
-                Creator.getTrackGetSetInterractor(this),
-                cleanSearchHistory = Creator.getCleanStoreInterractor(),
-                checking = Creator.getCheckNetwork(this),
-                trackSearchInteractor = Creator.provideTrackInteractor(),
-            )
-        )[SearchViewModel::class.java]
 
         viewModel.screenState.observe(this) { state ->
             when (state) {
