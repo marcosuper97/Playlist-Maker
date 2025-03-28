@@ -57,4 +57,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.serialization.json)
     implementation (libs.koin.android)
+    implementation ("androidx.viewpager2:viewpager2:1.1.0")
+    implementation ("com.google.android.material:material:1.8.0")
+    implementation ("androidx.fragment:fragment-ktx:1.8.6")
 }
