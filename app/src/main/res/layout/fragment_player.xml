@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    tools:context="com.example.playlistmaker.ui.player.fragment.PlayerFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/playerActivity"
-        style="@style/activityStyle"
+        style="@style/fragmentStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/bottom_padding">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/start"
@@ -57,7 +59,7 @@
             app:layout_constraintEnd_toEndOf="@id/end"
             app:layout_constraintStart_toStartOf="@id/start"
             app:layout_constraintTop_toBottomOf="@id/player_back"
-            tools:src="@drawable/player_placeholder" />
+            android:src="@drawable/player_placeholder" />
 
         <TextView
             android:id="@+id/song_name"

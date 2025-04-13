@@ -1,51 +1,54 @@
-package com.example.playlistmaker.ui.search.activity
+package com.example.playlistmaker.ui.search.fragment
 
 import android.content.Context
-import android.content.Intent
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.search.State
-import com.example.playlistmaker.ui.player.activity.PlayerActivity
+import com.example.playlistmaker.ui.player.fragment.PlayerFragment
 import com.example.playlistmaker.ui.search.view_model.SearchViewModel
 import com.example.playlistmaker.util.GsonClient
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
     private val handler: Handler by lazy { Handler(Looper.getMainLooper()) }
     private var searchQuery: String = STR_DEF
     private lateinit var searchAdapter: SearchAdapter
-    private lateinit var binding: ActivitySearchBinding
-    private val viewModel: SearchViewModel by viewModel{ parametersOf(this@SearchActivity) }
-    private val playerIntent: Intent by lazy {
-        Intent(this, PlayerActivity::class.java)
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: SearchViewModel by viewModel { parametersOf(requireContext()) }
+
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.searchActivity)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        viewModel.screenState.observe(this) { state ->
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.screenState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 State.EmptyScreen -> emptyUi()
                 State.Loading -> loadingUi()
@@ -58,14 +61,16 @@ class SearchActivity : AppCompatActivity() {
 
         val onTrackClickListener: (Track) -> Unit = { track ->
             viewModel.onTrackClicked(track)
-            playerIntent.putExtra("track", GsonClient.objectToJson(track))
-            this.startActivity(playerIntent)
+            findNavController().navigate(
+                R.id.action_searchFragment_to_playerFragment,
+                PlayerFragment.createArgs(GsonClient.objectToJson(track))
+            )
         }
 
         searchAdapter = SearchAdapter(onTrackClickListener)
 
         binding.recyclerView.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         binding.recyclerView.adapter = searchAdapter
 
@@ -78,7 +83,7 @@ class SearchActivity : AppCompatActivity() {
                 if (s != null) {
                     searchQuery = s.toString()
                     searchRequest()
-                }else {
+                } else {
                     handler.removeCallbacks(searchRunnable)
                 }
             }
@@ -94,22 +99,19 @@ class SearchActivity : AppCompatActivity() {
             handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
         }
 
-        binding.searchBack.setNavigationOnClickListener {
-            finish()
-        }
-
         binding.clearButton.setOnClickListener {
-            hideKeyboard(this, binding.clearButton)
+            hideKeyboard(requireContext(), binding.clearButton)
             binding.searchHint.setText(STR_DEF)
             viewModel.clickOnClearButton()
         }
 
-        binding.searchUpdate.setOnClickListener(){
+        binding.searchUpdate.setOnClickListener() {
             searchRequest()
         }
 
         binding.searchHint.requestFocus()
     }
+
 
     private fun emptyUi() {
         binding.progressBar.visibility = View.GONE
@@ -153,7 +155,7 @@ class SearchActivity : AppCompatActivity() {
         binding.recyclerView.visibility = View.GONE
         binding.searchPlaceholder.visibility = View.VISIBLE
         binding.searchUpdate.visibility = View.VISIBLE
-        binding.errorImagePlaceholder.setImageDrawable(getDrawable(R.drawable.network_error))
+        binding.errorImagePlaceholder.setImageDrawable(requireContext().getDrawable(R.drawable.network_error))
         binding.errorStatus.setText(R.string.network_error)
     }
 
@@ -162,7 +164,7 @@ class SearchActivity : AppCompatActivity() {
         binding.recyclerView.visibility = View.GONE
         binding.searchPlaceholder.visibility = View.VISIBLE
         binding.searchUpdate.visibility = View.GONE
-        binding.errorImagePlaceholder.setImageDrawable(getDrawable(R.drawable.tracks_not_found))
+        binding.errorImagePlaceholder.setImageDrawable(requireContext().getDrawable(R.drawable.tracks_not_found))
         binding.errorStatus.setText(R.string.tracks_not_found)
     }
 

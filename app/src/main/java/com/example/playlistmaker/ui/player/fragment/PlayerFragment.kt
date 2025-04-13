@@ -1,14 +1,16 @@
-package com.example.playlistmaker.ui.player.activity
+package com.example.playlistmaker.ui.player.fragment
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityPlayerBinding
+import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.player.PlayerStateUi
 import com.example.playlistmaker.ui.player.view_model.PlayerViewModel
@@ -17,52 +19,61 @@ import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityPlayerBinding
+class PlayerFragment : Fragment() {
+    private var _binding: FragmentPlayerBinding? = null
+    private val binding get() = _binding!!
+
     private val viewModel: PlayerViewModel by lazy {
-            val trackToJson = intent.getStringExtra("track")
-            getViewModel { parametersOf(trackToJson) }
+        getViewModel { parametersOf(arguments?.getString(TRACK_TAG)) }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivityPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.playerActivity)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+    override fun onDestroy() {
+        findNavController().popBackStack(R.id.searchFragment,false)
+        _binding = null
+        super.onDestroy()
+    }
 
-        viewModel.playerStateUi.observe(this) { state ->
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentPlayerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.playerStateUi.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is PlayerStateUi.Pause -> {
                     showUi(state.track)
-                    binding.playPauseButton.setImageDrawable(getDrawable(R.drawable.button_play))
+                    binding.playPauseButton.setImageDrawable(requireContext().getDrawable(R.drawable.button_play))
                 }
 
                 is PlayerStateUi.Play -> {
                     showUi(state.track)
                     binding.time.text = state.time
-                    binding.playPauseButton.setImageDrawable(getDrawable(R.drawable.button_pause))
+                    binding.playPauseButton.setImageDrawable(requireContext().getDrawable(R.drawable.button_pause))
                 }
 
                 is PlayerStateUi.ReadyToPlay -> {
                     showUi(state.track)
-                    binding.playPauseButton.setImageDrawable(getDrawable(R.drawable.button_play))
+                    binding.playPauseButton.setImageDrawable(requireContext().getDrawable(R.drawable.button_play))
                     binding.time.text = TIME_DEF
                 }
             }
         }
 
         binding.playerBack.setOnClickListener {
-            finish()
+            onDestroy()
         }
 
         binding.playPauseButton.setOnClickListener {
             viewModel.onClickPlayMusic()
         }
+
     }
 
     override fun onPause() {
@@ -92,5 +103,11 @@ class PlayerActivity : AppCompatActivity() {
 
     companion object {
         private const val TIME_DEF = "00:30"
+        private const val TRACK_TAG = "track"
+
+        fun createArgs(track: String): Bundle = bundleOf(
+            TRACK_TAG to track
+        )
     }
+
 }

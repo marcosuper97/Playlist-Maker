@@ -1,20 +1,18 @@
 package com.example.playlistmaker.di
 
 import android.content.Context
-import com.example.playlistmaker.domain.search.impl.StoreCleanerInterractorImpl
 import com.example.playlistmaker.data.search.impl.StorageGetSetInterractorImpl
-import com.example.playlistmaker.domain.main_menu_navigation.MainNavigationInteractor
-import com.example.playlistmaker.domain.main_menu_navigation.impl.MainNavigationInteractorImpl
 import com.example.playlistmaker.domain.network.NetworkCheckingInteractor
 import com.example.playlistmaker.domain.network.impl.NetworkCheckingInteractorImpl
 import com.example.playlistmaker.domain.player.GetTrackInteractor
 import com.example.playlistmaker.domain.player.PlayerInterractor
 import com.example.playlistmaker.domain.player.impl.GetTrackInteractorImpl
 import com.example.playlistmaker.domain.player.impl.PlayerInterractorImpl
+import com.example.playlistmaker.domain.search.SearchTrackInteractor
 import com.example.playlistmaker.domain.search.StorageGetSetInterractor
 import com.example.playlistmaker.domain.search.StoreCleanerInterractor
-import com.example.playlistmaker.domain.search.SearchTrackInteractor
 import com.example.playlistmaker.domain.search.impl.SearchTrackInteractorImpl
+import com.example.playlistmaker.domain.search.impl.StoreCleanerInterractorImpl
 import com.example.playlistmaker.domain.settings.ThemeChangerInteractor
 import com.example.playlistmaker.domain.settings.impl.ThemeChangerInteractorImpl
 import com.example.playlistmaker.domain.shairing.SharingInteractor
@@ -23,10 +21,6 @@ import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 val interactorModule = module {
-
-    factory<MainNavigationInteractor> { (context: Context) ->
-        MainNavigationInteractorImpl(get { parametersOf(context) })
-    }
 
     factory<PlayerInterractor> {
         PlayerInterractorImpl(get())
