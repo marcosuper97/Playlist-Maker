@@ -1,51 +1,57 @@
 package com.example.playlistmaker.ui.main.activity
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityMainBinding
-import com.example.playlistmaker.domain.main_menu_navigation.Navigation
-import com.example.playlistmaker.ui.main.view_model.MainViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
 class MainActivity : AppCompatActivity(){
 
-    private lateinit var binding: ActivityMainBinding
-    private val viewModel: MainViewModel by viewModel { parametersOf(this) }
+    private var _binding: ActivityMainBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        systemBottomPadding(REMOVE_BOTTOM_PADDING)
 
-        viewModel.menuEvent.observe(this){ event ->
-            when (event){
-                Navigation.Library -> viewModel.openLibrary()
-                Navigation.Search -> viewModel.openSearch()
-                Navigation.Settings -> viewModel.openSettings()
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.root_container) as NavHostFragment
+        val navController = navHostFragment.navController
+        binding.bottomNav.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.playerFragment -> {
+                    binding.bottomNav.visibility = View.GONE
+                    systemBottomPadding(APPLY_BOTTOM_PADDING)
+                }
+                else -> {
+                    binding.bottomNav.visibility = View.VISIBLE
+                    systemBottomPadding(REMOVE_BOTTOM_PADDING)
+                }
             }
         }
 
-        binding.searchButton.setOnClickListener {
-           viewModel.clickOnSearch()
-        }
+    }
 
-        binding.libraryButton.setOnClickListener {
-            viewModel.clickOnLibrary()
+    private fun systemBottomPadding(boolean: Boolean){
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, if(boolean) systemBars.bottom else 0)
+            insets
         }
+    }
 
-        binding.settingsButton.setOnClickListener {
-            viewModel.clickOnSettings()
-        }
+    companion object{
+        private const val APPLY_BOTTOM_PADDING = true
+        private const val REMOVE_BOTTOM_PADDING = false
     }
 }

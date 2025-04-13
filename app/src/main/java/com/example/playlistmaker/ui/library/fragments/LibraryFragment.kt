@@ -6,16 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.FragmentFavoriteTracksBinding
 import com.example.playlistmaker.databinding.FragmentLibraryBinding
-import com.example.playlistmaker.ui.library.view_model_activity.LibraryActivityViewModel
 import com.example.playlistmaker.ui.library.view_model_fragments.LibraryFragmentViewModel
-import com.example.playlistmaker.ui.settings.view_model.SettingsViewModel
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
 class LibraryFragment : Fragment() {
     private lateinit var binding: FragmentLibraryBinding
