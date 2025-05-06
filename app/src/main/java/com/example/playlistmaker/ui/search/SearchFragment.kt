@@ -1,10 +1,8 @@
-package com.example.playlistmaker.ui.search.fragment
+package com.example.playlistmaker.ui.search
 
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -12,25 +10,31 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.domain.search.State
-import com.example.playlistmaker.ui.player.fragment.PlayerFragment
-import com.example.playlistmaker.ui.search.view_model.SearchViewModel
+import com.example.playlistmaker.presentation.search.SearchViewModel
+import com.example.playlistmaker.ui.player.PlayerFragment
 import com.example.playlistmaker.util.GsonClient
+import com.example.playlistmaker.util.SearchState
+import com.example.playlistmaker.util.debounce
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class SearchFragment : Fragment() {
-    private val handler: Handler by lazy { Handler(Looper.getMainLooper()) }
-    private var searchQuery: String = STR_DEF
+    private var searchQuery: String? = null
     private lateinit var searchAdapter: SearchAdapter
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
     private val viewModel: SearchViewModel by viewModel { parametersOf(requireContext()) }
+    private lateinit var onTrackClickDebounce: (Track) -> Unit
+    private var searchDebounceJob: Job? = null
 
     override fun onDestroyView() {
         _binding = null
@@ -50,16 +54,20 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel.screenState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                State.EmptyScreen -> emptyUi()
-                State.Loading -> loadingUi()
-                State.NetworkError -> networkErrorUi()
-                State.NothingFound -> tracksNotFoundUi()
-                is State.ShowHistoryContent -> historyUi(state.tracks)
-                is State.ShowSearchContent -> contentUi(state.tracks)
+                SearchState.EmptyScreen -> emptyUi()
+                SearchState.Loading -> loadingUi()
+                SearchState.NetworkError -> networkErrorUi()
+                SearchState.NothingFound -> tracksNotFoundUi()
+                is SearchState.ShowHistoryContent -> historyUi(state.tracks)
+                is SearchState.ShowSearchContent -> contentUi(state.tracks)
             }
         }
 
-        val onTrackClickListener: (Track) -> Unit = { track ->
+        onTrackClickDebounce = debounce<Track>(
+            CLICK_DEBOUNCE_DELAY,
+            viewLifecycleOwner.lifecycleScope,
+            false
+        ) { track ->
             viewModel.onTrackClicked(track)
             findNavController().navigate(
                 R.id.action_searchFragment_to_playerFragment,
@@ -67,7 +75,7 @@ class SearchFragment : Fragment() {
             )
         }
 
-        searchAdapter = SearchAdapter(onTrackClickListener)
+        searchAdapter = SearchAdapter(onTrackClickDebounce)
 
         binding.recyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -79,12 +87,12 @@ class SearchFragment : Fragment() {
             override fun afterTextChanged(p0: Editable?) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                binding.clearButton.visibility = clearButtonVisibility(s)
-                if (s != null) {
-                    searchQuery = s.toString()
-                    searchRequest()
+                if (s==null || s.toString().isEmpty()){
+                    viewModel.clearSearchRequest()
                 } else {
-                    handler.removeCallbacks(searchRunnable)
+                    binding.clearButton.visibility = clearButtonVisibility(s)
+                    searchQuery = s.toString()
+                    searchRequestDebounce(searchQuery!!)
                 }
             }
         }
@@ -95,18 +103,14 @@ class SearchFragment : Fragment() {
             viewModel.onClickSearchClear()
         }
 
-        binding.searchUpdate.setOnClickListener {
-            handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
-        }
-
         binding.clearButton.setOnClickListener {
             hideKeyboard(requireContext(), binding.clearButton)
             binding.searchHint.setText(STR_DEF)
-            viewModel.clickOnClearButton()
+            viewModel.clearSearchRequest()
         }
 
-        binding.searchUpdate.setOnClickListener() {
-            searchRequest()
+        binding.searchUpdate.setOnClickListener(){
+            viewModel.toSearchRequest(searchQuery!!)
         }
 
         binding.searchHint.requestFocus()
@@ -164,26 +168,28 @@ class SearchFragment : Fragment() {
         binding.recyclerView.visibility = View.GONE
         binding.searchPlaceholder.visibility = View.VISIBLE
         binding.searchUpdate.visibility = View.GONE
+        binding.clearSearchHistory.visibility = View.GONE
+        binding.youSearchedIt.visibility = View.GONE
         binding.errorImagePlaceholder.setImageDrawable(requireContext().getDrawable(R.drawable.tracks_not_found))
         binding.errorStatus.setText(R.string.tracks_not_found)
     }
 
-    private fun searchRequest() {
-        handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
-    }
-
-    private val searchRunnable = Runnable {
-        if (searchQuery.isNotEmpty()) {
-            viewModel.toSearchRequest(searchQuery)
-        }
-    }
 
     private fun clearButtonVisibility(s: CharSequence?): Int {
         return if (s.isNullOrEmpty()) {
             View.GONE
         } else {
             View.VISIBLE
+        }
+    }
+
+    private fun searchRequestDebounce(query: String) {
+        if (searchQuery == query && searchQuery?.isNotEmpty() == true) {
+            searchDebounceJob?.cancel()
+            searchDebounceJob = lifecycleScope.launch {
+                delay(SEARCH_DEBOUNCE_DELAY)
+                viewModel.toSearchRequest(query)
+            }
         }
     }
 
@@ -196,5 +202,6 @@ class SearchFragment : Fragment() {
     companion object {
         private const val STR_DEF: String = ""
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 300L
     }
 }

@@ -1,8 +1,11 @@
 package com.example.playlistmaker.util
 
-sealed class MediaPlayerState {
-    data object Default : MediaPlayerState()
-    data object Prepared : MediaPlayerState()
-    data object Playing : MediaPlayerState()
-    data object Paused : MediaPlayerState()
+sealed class MediaPlayerState(val isPlayButtonEnabled: Boolean,val progress: String) {
+    companion object{
+        private const val TIME_DEF = "00:30"
+    }
+    class Default : MediaPlayerState(false, TIME_DEF)
+    class Prepared() : MediaPlayerState(true, TIME_DEF)
+    class Playing(progress: String) : MediaPlayerState(true, progress)
+    class Paused(progress: String) : MediaPlayerState(true, progress)
 }

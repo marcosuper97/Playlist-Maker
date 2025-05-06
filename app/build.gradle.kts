@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.playlistmaker"
-    compileSdk = 34
+    compileSdk = 35
 
     buildFeatures {
         viewBinding = true
@@ -62,4 +62,5 @@ dependencies {
     implementation ("androidx.fragment:fragment-ktx:1.8.6")
     implementation ("androidx.navigation:navigation-fragment-ktx:2.8.9")
     implementation ("androidx.navigation:navigation-ui-ktx:2.8.9")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 }

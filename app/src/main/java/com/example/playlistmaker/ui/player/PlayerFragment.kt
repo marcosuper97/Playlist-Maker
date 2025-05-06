@@ -1,5 +1,4 @@
-package com.example.playlistmaker.ui.player.fragment
-
+package com.example.playlistmaker.ui.player
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +11,9 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.domain.player.PlayerStateUi
-import com.example.playlistmaker.ui.player.view_model.PlayerViewModel
+import com.example.playlistmaker.presentation.player.PlayerViewModel
+import com.example.playlistmaker.util.GsonClient
+import com.example.playlistmaker.util.MediaPlayerState
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
@@ -22,13 +22,20 @@ import java.util.Locale
 class PlayerFragment : Fragment() {
     private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
+    private var trackObject: Track? = null
 
     private val viewModel: PlayerViewModel by lazy {
-        getViewModel { parametersOf(arguments?.getString(TRACK_TAG)) }
+        getViewModel {
+            parametersOf(
+                GsonClient.fromJsonToPlayer(
+                    arguments?.getString(TRACK_TAG).toString()
+                ).previewUrl
+            )
+        }
     }
 
     override fun onDestroy() {
-        findNavController().popBackStack(R.id.searchFragment,false)
+        findNavController().popBackStack(R.id.searchFragment, false)
         _binding = null
         super.onDestroy()
     }
@@ -44,24 +51,35 @@ class PlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        trackObject = arguments?.getString(TRACK_TAG)?.let { GsonClient.fromJsonToPlayer(it) }
         viewModel.playerStateUi.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is PlayerStateUi.Pause -> {
-                    showUi(state.track)
+                is MediaPlayerState.Default -> {
+                    showUi(trackObject!!)
+                    binding.time.text = state.progress
+                    binding.playPauseButton.isEnabled = state.isPlayButtonEnabled
                     binding.playPauseButton.setImageDrawable(requireContext().getDrawable(R.drawable.button_play))
                 }
 
-                is PlayerStateUi.Play -> {
-                    showUi(state.track)
-                    binding.time.text = state.time
+                is MediaPlayerState.Paused -> {
+                    showUi(trackObject!!)
+                    binding.time.text = state.progress
+                    binding.playPauseButton.isEnabled = state.isPlayButtonEnabled
+                    binding.playPauseButton.setImageDrawable(requireContext().getDrawable(R.drawable.button_play))
+                }
+
+                is MediaPlayerState.Playing -> {
+                    showUi(trackObject!!)
+                    binding.time.text = state.progress
+                    binding.playPauseButton.isEnabled = state.isPlayButtonEnabled
                     binding.playPauseButton.setImageDrawable(requireContext().getDrawable(R.drawable.button_pause))
                 }
 
-                is PlayerStateUi.ReadyToPlay -> {
-                    showUi(state.track)
+                is MediaPlayerState.Prepared -> {
+                    showUi(trackObject!!)
+                    binding.playPauseButton.isEnabled = state.isPlayButtonEnabled
                     binding.playPauseButton.setImageDrawable(requireContext().getDrawable(R.drawable.button_play))
-                    binding.time.text = TIME_DEF
+                    binding.time.text = state.progress
                 }
             }
         }
@@ -71,9 +89,8 @@ class PlayerFragment : Fragment() {
         }
 
         binding.playPauseButton.setOnClickListener {
-            viewModel.onClickPlayMusic()
+            viewModel.playBackControl()
         }
-
     }
 
     override fun onPause() {
@@ -94,7 +111,7 @@ class PlayerFragment : Fragment() {
         binding.genreName.text = track.primaryGenreName
         binding.countryName.text = track.country
         Glide.with(binding.cover)
-            .load(track.artworkUrl100)
+            .load(trackObject?.let { trackObject?.artworkUrl100 })
             .placeholder(R.drawable.player_placeholder)
             .centerCrop()
             .transform(RoundedCorners(8))
@@ -102,12 +119,9 @@ class PlayerFragment : Fragment() {
     }
 
     companion object {
-        private const val TIME_DEF = "00:30"
         private const val TRACK_TAG = "track"
-
         fun createArgs(track: String): Bundle = bundleOf(
             TRACK_TAG to track
         )
     }
-
 }

@@ -1,8 +1,6 @@
 package com.example.playlistmaker.di
 
 import android.content.Context
-import com.example.playlistmaker.data.network.NetworkCheckingRepository
-import com.example.playlistmaker.data.network.NetworkCheckingRepositoryImpl
 import com.example.playlistmaker.data.player.GetTrackRepository
 import com.example.playlistmaker.data.player.UserMediaPlayerRepository
 import com.example.playlistmaker.data.player.impl.GetTrackRepositoryImpl
@@ -28,10 +26,6 @@ val repositoryModule = module {
 
     single<StoreCleanerRepository> {
         StoreCleanerRepositoryImpl(get(named("history_preferences")))
-    }
-
-    single<NetworkCheckingRepository> {(context: Context) ->
-        NetworkCheckingRepositoryImpl(get{ parametersOf(context) })
     }
 
     single<ThemeChangerRepository> {
