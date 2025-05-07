@@ -1,4 +1,4 @@
-package com.example.playlistmaker.ui.library.fragments
+package com.example.playlistmaker.ui.library
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentMediaLibraryBinding
-import com.example.playlistmaker.ui.library.fragments.adapter_view_pager.ViewPagerAdapter
-import com.example.playlistmaker.ui.library.view_model_fragments.MediaLibraryViewModel
+import com.example.playlistmaker.ui.library.adapter_view_pager.ViewPagerAdapter
+import com.example.playlistmaker.presentation.library.MediaLibraryViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

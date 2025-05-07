@@ -5,7 +5,7 @@
     style="@style/fragmentStyle"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.playlistmaker.ui.search.fragment.SearchFragment">
+    tools:context="com.example.playlistmaker.ui.search.SearchFragment">
 
     <Toolbar
         android:id="@+id/search_back"

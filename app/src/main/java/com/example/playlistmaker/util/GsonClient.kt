@@ -22,9 +22,10 @@ object GsonClient {
     }
 
     fun fromJsonToPlayer(json: String): Track {
-        json.replaceAfterLast('/', FORMAT_SIZE)
-        val type = object : TypeToken<Track>() {}.type
-        return gson.fromJson(json, type)
+        var track: Track = gson.fromJson(json, object : TypeToken<Track>() {}.type)
+        val newArtWorkUrl = track.artworkUrl100.replaceAfterLast('/', FORMAT_SIZE)
+        track.artworkUrl100 = newArtWorkUrl
+        return track
     }
 
     private const val FORMAT_SIZE = "512x512bb.jpg"

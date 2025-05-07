@@ -1,19 +1,26 @@
 package com.example.playlistmaker.domain.search.impl
 
 import com.example.playlistmaker.data.search.SearchTrackRepository
+import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.search.SearchTrackInteractor
-import java.util.concurrent.Executors
+import com.example.playlistmaker.util.Resource
+import com.example.playlistmaker.util.SearchState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-class SearchTrackInteractorImpl(private val repository: SearchTrackRepository): SearchTrackInteractor {
-    private val executor = Executors.newCachedThreadPool()
-    override fun searchTracks(expression: String, consumer: SearchTrackInteractor.TrackConsumer) {
-        executor.execute {
-            consumer.consume(repository.searchTracks(expression))
+class SearchTrackInteractorImpl(private val repository: SearchTrackRepository) :
+    SearchTrackInteractor {
+    override fun searchTracks(expression: String): Flow<Pair<List<Track>?, SearchState?>> {
+        return repository.searchTracks(expression).map { result ->
+            when (result) {
+                is Resource.Success -> {
+                    Pair(result.data, null)
+                }
+
+                is Resource.Error -> {
+                    Pair(null, result.errorState)
+                }
+            }
         }
     }
-
-    override fun shutDown() {
-        executor.shutdown()
-    }
-
 }

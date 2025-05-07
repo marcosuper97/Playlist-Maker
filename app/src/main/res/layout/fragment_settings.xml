@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:id="@+id/settings"
     style="@style/fragmentStyle"
-    tools:context="com.example.playlistmaker.ui.settings.fragment.SettingsFragment">
+    tools:context="com.example.playlistmaker.ui.settings.SettingsFragment">
 
     <Toolbar
         android:id="@+id/settings_back"

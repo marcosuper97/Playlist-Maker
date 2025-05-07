@@ -2,13 +2,16 @@ package com.example.playlistmaker.domain.player.impl
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.playlistmaker.domain.player.PlayerInterractor
 import com.example.playlistmaker.data.player.UserMediaPlayerRepository
+import com.example.playlistmaker.domain.player.PlayerInterractor
 import com.example.playlistmaker.util.MediaPlayerState
+import kotlinx.coroutines.CoroutineScope
 
-class PlayerInterractorImpl(private val userMediaPlayerImpl: UserMediaPlayerRepository): PlayerInterractor {
+class PlayerInterractorImpl(
+    private val userMediaPlayerImpl: UserMediaPlayerRepository,
+) : PlayerInterractor {
 
-    private val _mediaPlayerState = MutableLiveData<MediaPlayerState>()
+    private var _mediaPlayerState = MutableLiveData<MediaPlayerState>()
     override val mediaPlayerState: LiveData<MediaPlayerState> get() = _mediaPlayerState
 
     init {
@@ -17,12 +20,8 @@ class PlayerInterractorImpl(private val userMediaPlayerImpl: UserMediaPlayerRepo
         }
     }
 
-    override fun getPlayTimer(): Int {
-       return userMediaPlayerImpl.getPlayTimer()
-    }
-
-    override fun playbackControl() {
-        userMediaPlayerImpl.playbackControl()
+    override fun playBackControl(scope: CoroutineScope) {
+        userMediaPlayerImpl.playbackControl(scope)
     }
 
     override fun preparePlayer(trackPreviewUrl: String) {
@@ -33,11 +32,8 @@ class PlayerInterractorImpl(private val userMediaPlayerImpl: UserMediaPlayerRepo
         userMediaPlayerImpl.release()
     }
 
-    override fun startMusic() {
-        userMediaPlayerImpl.playMusic()
-    }
-
     override fun pauseMusic() {
         userMediaPlayerImpl.pauseMusic()
     }
+
 }

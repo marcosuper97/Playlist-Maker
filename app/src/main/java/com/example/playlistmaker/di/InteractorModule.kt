@@ -2,8 +2,6 @@ package com.example.playlistmaker.di
 
 import android.content.Context
 import com.example.playlistmaker.data.search.impl.StorageGetSetInterractorImpl
-import com.example.playlistmaker.domain.network.NetworkCheckingInteractor
-import com.example.playlistmaker.domain.network.impl.NetworkCheckingInteractorImpl
 import com.example.playlistmaker.domain.player.GetTrackInteractor
 import com.example.playlistmaker.domain.player.PlayerInterractor
 import com.example.playlistmaker.domain.player.impl.GetTrackInteractorImpl
@@ -44,10 +42,6 @@ val interactorModule = module {
 
     factory<StoreCleanerInterractor> {
         StoreCleanerInterractorImpl(get())
-    }
-
-    factory<NetworkCheckingInteractor> { (context: Context)->
-        NetworkCheckingInteractorImpl(get { parametersOf(context) })
     }
 
     factory<SearchTrackInteractor> {
