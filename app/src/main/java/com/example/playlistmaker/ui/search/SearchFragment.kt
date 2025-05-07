@@ -21,20 +21,17 @@ import com.example.playlistmaker.ui.player.PlayerFragment
 import com.example.playlistmaker.util.GsonClient
 import com.example.playlistmaker.util.SearchState
 import com.example.playlistmaker.util.debounce
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class SearchFragment : Fragment() {
     private var searchQuery: String? = null
+    private var isFirstLaunch = true
     private lateinit var searchAdapter: SearchAdapter
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
     private val viewModel: SearchViewModel by viewModel { parametersOf(requireContext()) }
     private lateinit var onTrackClickDebounce: (Track) -> Unit
-    private var searchDebounceJob: Job? = null
 
     override fun onDestroyView() {
         _binding = null
@@ -48,6 +45,11 @@ class SearchFragment : Fragment() {
     ): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onPause() {
+        super.onPause()
+        searchQuery = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -82,18 +84,21 @@ class SearchFragment : Fragment() {
 
         binding.recyclerView.adapter = searchAdapter
 
+        if (isFirstLaunch) {
+            binding.searchHint.requestFocus()
+            isFirstLaunch = false
+        }
+
         val simpleTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun afterTextChanged(p0: Editable?) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s==null || s.toString().isEmpty()){
-                    viewModel.clearSearchRequest()
-                } else {
+                if (!s.isNullOrEmpty()) {
                     binding.clearButton.visibility = clearButtonVisibility(s)
                     searchQuery = s.toString()
                     searchRequestDebounce(searchQuery!!)
-                }
+                } else return
             }
         }
 
@@ -109,13 +114,10 @@ class SearchFragment : Fragment() {
             viewModel.clearSearchRequest()
         }
 
-        binding.searchUpdate.setOnClickListener(){
-            viewModel.toSearchRequest(searchQuery!!)
+        binding.searchUpdate.setOnClickListener() {
+            viewModel.searchRequestUpdate(searchQuery!!)
         }
-
-        binding.searchHint.requestFocus()
     }
-
 
     private fun emptyUi() {
         binding.progressBar.visibility = View.GONE
@@ -184,13 +186,9 @@ class SearchFragment : Fragment() {
     }
 
     private fun searchRequestDebounce(query: String) {
-        if (searchQuery == query && searchQuery?.isNotEmpty() == true) {
-            searchDebounceJob?.cancel()
-            searchDebounceJob = lifecycleScope.launch {
-                delay(SEARCH_DEBOUNCE_DELAY)
-                viewModel.toSearchRequest(query)
-            }
-        }
+        if (searchQuery == query && !searchQuery.isNullOrEmpty()) {
+            viewModel.searchRequestDebounce(query)
+        } else return
     }
 
     private fun hideKeyboard(context: Context, view: View) {
@@ -201,7 +199,6 @@ class SearchFragment : Fragment() {
 
     companion object {
         private const val STR_DEF: String = ""
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 300L
     }
 }

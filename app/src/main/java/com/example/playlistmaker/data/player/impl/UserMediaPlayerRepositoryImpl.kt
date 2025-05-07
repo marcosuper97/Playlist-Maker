@@ -18,6 +18,7 @@ class UserMediaPlayerRepositoryImpl(
     UserMediaPlayerRepository {
     private var timeJob: Job? = null
     private var trackUrl: String? = null
+    private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
     private val _mediaPlayerState = MutableLiveData<MediaPlayerState>(MediaPlayerState.Default())
     override val mediaPlayerState: LiveData<MediaPlayerState> get() = _mediaPlayerState
 
@@ -49,7 +50,7 @@ class UserMediaPlayerRepositoryImpl(
         timeJob?.cancel()
         timeJob = scope.launch {
             while (mediaPlayer.isPlaying) {
-                delay(300)
+                delay(UPDATE_TIME)
                 _mediaPlayerState.postValue(MediaPlayerState.Playing(getPlayTimer()))
             }
         }
@@ -95,9 +96,10 @@ class UserMediaPlayerRepositoryImpl(
     }
 
     override fun getPlayTimer(): String {
-        return SimpleDateFormat(
-            "mm:ss",
-            Locale.getDefault()
-        ).format(mediaPlayer.duration - mediaPlayer.currentPosition)
+        return dateFormat.format(mediaPlayer.duration - mediaPlayer.currentPosition)
+    }
+
+    companion object{
+        private const val UPDATE_TIME:Long = 300
     }
 }
