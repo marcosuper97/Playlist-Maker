@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.playlistmaker"
-    compileSdk = 34
+    compileSdk = 35
 
     buildFeatures {
         viewBinding = true
@@ -57,9 +57,10 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.serialization.json)
     implementation (libs.koin.android)
-    implementation ("androidx.viewpager2:viewpager2:1.1.0")
-    implementation ("com.google.android.material:material:1.8.0")
-    implementation ("androidx.fragment:fragment-ktx:1.8.6")
-    implementation ("androidx.navigation:navigation-fragment-ktx:2.8.9")
-    implementation ("androidx.navigation:navigation-ui-ktx:2.8.9")
+    implementation (libs.androidx.viewpager2)
+    implementation (libs.material.v180)
+    implementation (libs.androidx.fragment.ktx)
+    implementation (libs.androidx.navigation.fragment.ktx)
+    implementation (libs.androidx.navigation.ui.ktx)
+    implementation (libs.kotlinx.coroutines.android)
 }

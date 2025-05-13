@@ -1,4 +1,4 @@
-package com.example.playlistmaker.ui.library.view_model_fragments
+package com.example.playlistmaker.presentation.library
 
 import androidx.lifecycle.ViewModel
 

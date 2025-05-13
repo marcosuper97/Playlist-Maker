@@ -5,38 +5,68 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.playlistmaker.data.player.UserMediaPlayerRepository
 import com.example.playlistmaker.util.MediaPlayerState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-class UserMediaPlayerRepositoryImpl(private val mediaPlayer: MediaPlayer) :
+class UserMediaPlayerRepositoryImpl(
+    private val mediaPlayer: MediaPlayer
+) :
     UserMediaPlayerRepository {
-
-    private val _mediaPlayerState = MutableLiveData<MediaPlayerState>(MediaPlayerState.Default)
+    private var timeJob: Job? = null
+    private var trackUrl: String? = null
+    private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
+    private val _mediaPlayerState = MutableLiveData<MediaPlayerState>(MediaPlayerState.Default())
     override val mediaPlayerState: LiveData<MediaPlayerState> get() = _mediaPlayerState
 
     override fun preparePlayer(trackPreviewUrl: String) {
-        mediaPlayer.setDataSource(trackPreviewUrl)
+        trackUrl = trackPreviewUrl
+        mediaPlayer.setDataSource(trackUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            _mediaPlayerState.postValue(MediaPlayerState.Prepared)
+            _mediaPlayerState.postValue(MediaPlayerState.Prepared())
         }
         mediaPlayer.setOnCompletionListener {
+            _mediaPlayerState.postValue(MediaPlayerState.Default())
             mediaPlayer.reset()
             mediaPlayer.setDataSource(trackPreviewUrl)
             mediaPlayer.prepareAsync()
-            _mediaPlayerState.postValue(MediaPlayerState.Prepared)
+            _mediaPlayerState.postValue(MediaPlayerState.Prepared())
         }
     }
 
-    override fun playMusic() {
-        mediaPlayer.start()
-        _mediaPlayerState.postValue(MediaPlayerState.Playing)
+    override fun playMusic(scope: CoroutineScope) {
+        if (!mediaPlayer.isPlaying) {
+            mediaPlayer.start()
+            _mediaPlayerState.postValue(MediaPlayerState.Playing(getPlayTimer()))
+            startTimer(scope)
+        }
+    }
+
+    override fun startTimer(scope: CoroutineScope) {
+        timeJob?.cancel()
+        timeJob = scope.launch {
+            while (mediaPlayer.isPlaying) {
+                delay(UPDATE_TIME)
+                _mediaPlayerState.postValue(MediaPlayerState.Playing(getPlayTimer()))
+            }
+        }
     }
 
     override fun pauseMusic() {
-        mediaPlayer.pause()
-        _mediaPlayerState.postValue(MediaPlayerState.Paused)
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.pause()
+            timeJob?.cancel()
+            _mediaPlayerState.postValue(MediaPlayerState.Paused(getPlayTimer()))
+        }
     }
 
     override fun release() {
+        timeJob?.cancel()
+        timeJob = null
         mediaPlayer.release()
     }
 
@@ -44,28 +74,32 @@ class UserMediaPlayerRepositoryImpl(private val mediaPlayer: MediaPlayer) :
         mediaPlayer.reset()
     }
 
-    override fun playbackControl() {
+    override fun playbackControl(scope: CoroutineScope) {
         when (mediaPlayerState.value) {
-            MediaPlayerState.Playing -> {
+            is MediaPlayerState.Playing -> {
                 pauseMusic()
             }
-            MediaPlayerState.Prepared, MediaPlayerState.Paused -> {
-                playMusic()
+
+            is MediaPlayerState.Prepared, is MediaPlayerState.Paused -> {
+                playMusic(scope)
             }
 
-            MediaPlayerState.Default -> {
-                println("ДЕФОЛТ РЕПОЗИТОРИЙ")
+            is MediaPlayerState.Default -> {
+                if (trackUrl?.isEmpty() != true)
+                    preparePlayer(trackUrl!!)
             }
+
             null -> {
-                println("НУЛЛ РЕПОЗИТОРИЙ")
+                trackUrl?.let {preparePlayer(trackUrl!!)}
             }
         }
     }
 
-    override fun getPlayTimer():Int {
-        val totalDuration = mediaPlayer.duration
-        val currentPosition = mediaPlayer.currentPosition
-        println(totalDuration - currentPosition)
-        return totalDuration - currentPosition
+    override fun getPlayTimer(): String {
+        return dateFormat.format(mediaPlayer.duration - mediaPlayer.currentPosition)
+    }
+
+    companion object{
+        private const val UPDATE_TIME:Long = 300
     }
 }

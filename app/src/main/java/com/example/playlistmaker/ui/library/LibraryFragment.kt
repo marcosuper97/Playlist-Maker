@@ -1,4 +1,4 @@
-package com.example.playlistmaker.ui.library.fragments
+package com.example.playlistmaker.ui.library
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import com.example.playlistmaker.databinding.FragmentLibraryBinding
-import com.example.playlistmaker.ui.library.view_model_fragments.LibraryFragmentViewModel
+import com.example.playlistmaker.presentation.library.LibraryFragmentViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LibraryFragment : Fragment() {
