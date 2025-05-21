@@ -17,17 +17,20 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.search.SearchViewModel
+import com.example.playlistmaker.ui.common.TrackListAdapter
 import com.example.playlistmaker.ui.player.PlayerFragment
 import com.example.playlistmaker.util.GsonClient
 import com.example.playlistmaker.util.SearchState
 import com.example.playlistmaker.util.debounce
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class SearchFragment : Fragment() {
     private var searchQuery: String? = null
     private var isFirstLaunch = true
-    private lateinit var searchAdapter: SearchAdapter
+    private var isNotFirstResume = false
+    private lateinit var searchAdapter: TrackListAdapter
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
     private val viewModel: SearchViewModel by viewModel { parametersOf(requireContext()) }
@@ -36,6 +39,14 @@ class SearchFragment : Fragment() {
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isNotFirstResume) {
+            viewModel.resumeFragment()
+        }
+        isNotFirstResume = true
     }
 
     override fun onCreateView(
@@ -54,17 +65,6 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.screenState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                SearchState.EmptyScreen -> emptyUi()
-                SearchState.Loading -> loadingUi()
-                SearchState.NetworkError -> networkErrorUi()
-                SearchState.NothingFound -> tracksNotFoundUi()
-                is SearchState.ShowHistoryContent -> historyUi(state.tracks)
-                is SearchState.ShowSearchContent -> contentUi(state.tracks)
-            }
-        }
-
         onTrackClickDebounce = debounce<Track>(
             CLICK_DEBOUNCE_DELAY,
             viewLifecycleOwner.lifecycleScope,
@@ -77,12 +77,23 @@ class SearchFragment : Fragment() {
             )
         }
 
-        searchAdapter = SearchAdapter(onTrackClickDebounce)
-
+        searchAdapter = TrackListAdapter(onTrackClickDebounce)
         binding.recyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-
         binding.recyclerView.adapter = searchAdapter
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.screenState.collect() { state ->
+                when (state) {
+                    SearchState.EmptyScreen -> emptyUi()
+                    SearchState.Loading -> loadingUi()
+                    SearchState.NetworkError -> networkErrorUi()
+                    SearchState.NothingFound -> tracksNotFoundUi()
+                    is SearchState.ShowHistoryContent -> historyUi(state.tracks)
+                    is SearchState.ShowSearchContent -> contentUi(state.tracks)
+                }
+            }
+        }
 
         if (isFirstLaunch) {
             binding.searchHint.requestFocus()
@@ -111,7 +122,7 @@ class SearchFragment : Fragment() {
         binding.clearButton.setOnClickListener {
             hideKeyboard(requireContext(), binding.clearButton)
             binding.searchHint.setText(STR_DEF)
-            viewModel.clearSearchRequest()
+            viewModel.clickOnClearSearchRequest()
         }
 
         binding.searchUpdate.setOnClickListener() {
