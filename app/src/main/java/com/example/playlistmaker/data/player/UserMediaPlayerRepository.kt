@@ -3,11 +3,12 @@ package com.example.playlistmaker.data.player
 import androidx.lifecycle.LiveData
 import com.example.playlistmaker.util.MediaPlayerState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.StateFlow
 
 
 interface UserMediaPlayerRepository {
 
-    val mediaPlayerState: LiveData<MediaPlayerState>
+    val mediaPlayerState: StateFlow<MediaPlayerState>
 
     fun pauseMusic()
 

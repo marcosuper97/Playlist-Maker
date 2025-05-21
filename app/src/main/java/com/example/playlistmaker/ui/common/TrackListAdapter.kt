@@ -1,4 +1,4 @@
-package com.example.playlistmaker.ui.search
+package com.example.playlistmaker.ui.common
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,17 +6,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.Track
 
-class SearchAdapter(private val onTrackClickListener: (Track) -> Unit) :
-    RecyclerView.Adapter<SearchViewHolder>() {
+class TrackListAdapter(private val onTrackClickListener: (Track) -> Unit) :
+    RecyclerView.Adapter<TrackListViewHolder>() {
 
     var tracks: List<Track> = mutableListOf()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackListViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.track_layout, parent, false)
-        return SearchViewHolder(view, onTrackClickListener)
+        return TrackListViewHolder(view, onTrackClickListener)
     }
 
-    override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: TrackListViewHolder, position: Int) {
         holder.bind(tracks[position])
     }
 

@@ -1,4 +1,4 @@
-package com.example.playlistmaker.ui.search
+package com.example.playlistmaker.ui.common
 
 import android.view.View
 import android.widget.ImageView
@@ -11,7 +11,7 @@ import com.example.playlistmaker.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class SearchViewHolder(itemView: View, val onTrackClickListener: (Track) -> Unit) :
+class TrackListViewHolder(itemView: View, val onTrackClickListener: (Track) -> Unit) :
     RecyclerView.ViewHolder(itemView) {
 
     private val trackName: TextView = itemView.findViewById(R.id.track_name)

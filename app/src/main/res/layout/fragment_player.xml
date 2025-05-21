@@ -107,7 +107,7 @@
             android:id="@+id/like_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/button_like"
+            android:src="@drawable/not_liked"
             app:layout_constraintBottom_toBottomOf="@id/add_button"
             app:layout_constraintEnd_toEndOf="@id/end"
             app:layout_constraintTop_toTopOf="@id/add_button" />
