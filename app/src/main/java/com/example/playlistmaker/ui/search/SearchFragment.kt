@@ -10,7 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
@@ -83,14 +85,18 @@ class SearchFragment : Fragment() {
         binding.recyclerView.adapter = searchAdapter
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.screenState.collect() { state ->
-                when (state) {
-                    SearchState.EmptyScreen -> emptyUi()
-                    SearchState.Loading -> loadingUi()
-                    SearchState.NetworkError -> networkErrorUi()
-                    SearchState.NothingFound -> tracksNotFoundUi()
-                    is SearchState.ShowHistoryContent -> historyUi(state.tracks)
-                    is SearchState.ShowSearchContent -> contentUi(state.tracks)
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED){
+                    viewModel.screenState.collect() { state ->
+                        when (state) {
+                            SearchState.EmptyScreen -> emptyUi()
+                            SearchState.Loading -> loadingUi()
+                            SearchState.NetworkError -> networkErrorUi()
+                            SearchState.NothingFound -> tracksNotFoundUi()
+                            is SearchState.ShowHistoryContent -> historyUi(state.tracks)
+                            is SearchState.ShowSearchContent -> contentUi(state.tracks)
+                        }
+                    }
                 }
             }
         }
