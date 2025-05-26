@@ -50,6 +50,7 @@ class SearchViewModel(
 
     fun clickOnClearSearchRequest() {
         viewModelScope.launch {
+            searchDebounceJob?.cancel()
             showSearchHistory(
                 searchHistoryInteractor.getSearchHistory().first()
             )

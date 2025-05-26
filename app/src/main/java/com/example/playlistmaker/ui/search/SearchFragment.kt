@@ -37,6 +37,7 @@ class SearchFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: SearchViewModel by viewModel { parametersOf(requireContext()) }
     private lateinit var onTrackClickDebounce: (Track) -> Unit
+    private var isTextProgrammaticChange = false
 
     override fun onDestroyView() {
         _binding = null
@@ -115,7 +116,11 @@ class SearchFragment : Fragment() {
                     binding.clearButton.visibility = clearButtonVisibility(s)
                     searchQuery = s.toString()
                     searchRequestDebounce(searchQuery!!)
-                } else return
+                } else if(s.isNullOrEmpty()){
+                    if (!isTextProgrammaticChange) {
+                        clearRequest()
+                    }
+                }
             }
         }
 
@@ -126,14 +131,20 @@ class SearchFragment : Fragment() {
         }
 
         binding.clearButton.setOnClickListener {
-            hideKeyboard(requireContext(), binding.clearButton)
-            binding.searchHint.setText(STR_DEF)
-            viewModel.clickOnClearSearchRequest()
+            clearRequest()
         }
 
         binding.searchUpdate.setOnClickListener() {
             viewModel.searchRequestUpdate(searchQuery!!)
         }
+    }
+
+    private fun clearRequest(){
+        isTextProgrammaticChange = true
+        hideKeyboard(requireContext(), binding.clearButton)
+        binding.searchHint.setText(STR_DEF)
+        viewModel.clickOnClearSearchRequest()
+        isTextProgrammaticChange = false
     }
 
     private fun emptyUi() {
