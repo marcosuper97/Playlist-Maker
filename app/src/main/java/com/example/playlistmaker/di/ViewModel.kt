@@ -8,19 +8,18 @@ import com.example.playlistmaker.presentation.library.MediaLibraryViewModel
 import com.example.playlistmaker.presentation.player.PlayerViewModel
 import com.example.playlistmaker.presentation.search.SearchViewModel
 import com.example.playlistmaker.presentation.settings.SettingsViewModel
-import kotlinx.coroutines.CoroutineScope
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 val viewModel = module {
 
-    viewModel { (trackPreviewUrl: String) ->
-        PlayerViewModel(trackPreviewUrl, get{ parametersOf(trackPreviewUrl) })
+    viewModel { (track: Track) ->
+        PlayerViewModel(track, get(), get())
     }
 
     viewModel{(context: Context) ->
-        SearchViewModel(get(),get(),get{ parametersOf(context) })
+        SearchViewModel(get(), get{ parametersOf(context) }, get())
     }
 
     viewModel{ (context: Context) ->
@@ -28,7 +27,7 @@ val viewModel = module {
     }
 
     viewModel{
-        FavoriteTracksViewModel()
+        FavoriteTracksViewModel(get())
     }
 
     viewModel{
@@ -38,6 +37,4 @@ val viewModel = module {
     viewModel{
         MediaLibraryViewModel()
     }
-
-
 }
