@@ -2,8 +2,10 @@ package com.example.playlistmaker.di
 
 import android.content.Context
 import com.example.playlistmaker.data.search.impl.SearchHistoryInteractorImpl
-import com.example.playlistmaker.domain.db.DatabaseInteractor
-import com.example.playlistmaker.domain.db.impl.DatabaseInteractorImpl
+import com.example.playlistmaker.domain.db.favorite.FavoriteControlInteractor
+import com.example.playlistmaker.domain.db.favorite.impl.FavoriteControlInteractorImpl
+import com.example.playlistmaker.domain.db.playlist.PlaylistInteractor
+import com.example.playlistmaker.domain.db.playlist.PlaylistInteractorImpl
 import com.example.playlistmaker.domain.player.PlayerInterractor
 import com.example.playlistmaker.domain.player.impl.PlayerInterractorImpl
 import com.example.playlistmaker.domain.search.SearchHistoryInteractor
@@ -30,19 +32,19 @@ val interactorModule = module {
         ThemeChangerInteractorImpl(get())
     }
 
-    factory<SharingInteractor> {(context: Context) ->
-        SharingInteractorImpl(get{ parametersOf(context) })
+    factory<SharingInteractor> { (context: Context) ->
+        SharingInteractorImpl(get { parametersOf(context) })
     }
 
     factory<SearchHistoryInteractor> {
         SearchHistoryInteractorImpl(get())
     }
 
-    factory<SearchTrackInteractor> {
-        SearchTrackInteractorImpl(get())
+    factory<FavoriteControlInteractor> {
+        FavoriteControlInteractorImpl(get())
     }
 
-    factory<DatabaseInteractor>{
-        DatabaseInteractorImpl(get())
+    factory<PlaylistInteractor> {
+        PlaylistInteractorImpl(get(), get())
     }
 }

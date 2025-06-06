@@ -29,4 +29,21 @@
     <string name="new_playlist_button">Новый плейлист</string>
     <string name="favorite_tracks">Избранные треки</string>
     <string name="playlists">Плейлисты</string>
+    <string name="new_playlist">Новый плейлист</string>
+    <string name="description">Описание</string>
+    <string name="create">Создать</string>
+    <string name="name">Название*</string>
+    <string name="playlistExitDialogTitle">Завершить создание плейлиста?</string>
+    <string name="playlistExitDialogDescription">Все несохраненные данные будут потеряны</string>
+    <string name="complete">Завершить</string>
+    <string name="cancellation">Отмена</string>
+    <string name="settingsPermissionDialogTitle">Откройте доступ к галерее</string>
+    <string name="settingsPermissionDialogDescription">Для возможности загрузки изображения необходимо предоставить права доступа в настройках</string>
+    <plurals name="items_count">
+        <item quantity="zero">%d треков</item>
+        <item quantity="one">%d трек</item>
+        <item quantity="few">%d трека</item>
+        <item quantity="many">%d треков</item>
+        <item quantity="other">%d треков</item>
+    </plurals>
 </resources>

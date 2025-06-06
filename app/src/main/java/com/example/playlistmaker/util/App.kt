@@ -9,28 +9,27 @@ import com.example.playlistmaker.di.dataModule
 import com.example.playlistmaker.di.interactorModule
 import com.example.playlistmaker.di.repositoryModule
 import com.example.playlistmaker.di.viewModel
+import com.markodevcic.peko.PermissionRequester
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
 class App : Application() {
     var darkTheme = false
-
     private val darkThemePreferences: SharedPreferences by lazy {
         this.getSharedPreferences(DARK_PREFERENCES, Context.MODE_PRIVATE)
     }
-    private val firstLaunchFlag: SharedPreferences by lazy{
+    private val firstLaunchFlag: SharedPreferences by lazy {
         this.getSharedPreferences(FIRST_LAUNCH, Context.MODE_PRIVATE)
     }
 
 
-
     override fun onCreate() {
         super.onCreate()
-        startKoin{
+        startKoin {
             androidContext(this@App)
             modules(dataModule, interactorModule, repositoryModule, viewModel)
         }
-
+        PermissionRequester.initialize(applicationContext)
         instance = this
 
         val isFirstLaunch = isFirstLaunch()
@@ -66,7 +65,7 @@ class App : Application() {
         return firstLaunchFlag.getBoolean(FIRST_LAUNCH_KEY, true)
     }
 
-    private fun setFlag(status:Boolean){
+    private fun setFlag(status: Boolean) {
         firstLaunchFlag.edit().putBoolean(FIRST_LAUNCH_KEY, status).apply()
     }
 

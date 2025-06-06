@@ -6,10 +6,10 @@
     <translate
         android:fromYDelta="0%"
         android:toYDelta="100%"
-        android:zAdjustment="top"/>
+        android:zAdjustment="top" />
 
     <alpha
         android:fromAlpha="1.0"
-        android:toAlpha="0.0"/>
+        android:toAlpha="0.0" />
 
 </set>
