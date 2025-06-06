@@ -10,8 +10,11 @@
     <color name="light_grey">#E6E8EB</color>
     <color name="white_or_black">#1A1B22</color>
     <color name="like_color">#F56B6C</color>
-    
+    <color name="white_or_grey">#DADADA</color>
+
     <color name="bottom_nav_select">#3772E7</color>
     <color name="bottom_nav_unselected">#1A1B22</color>
     <color name="bottom_nav_back">#FFFFFF</color>
+    <color name="translucent_black">#7F1A1B22</color>
+    <color name="bottom_sheet_color">#FFFFFF</color>
 </resources>
