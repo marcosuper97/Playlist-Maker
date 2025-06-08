@@ -1,7 +1,6 @@
 package com.example.playlistmaker.ui.media_library.favorite
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentFavoriteTracksBinding
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.library.FavoriteTracksViewModel
-import com.example.playlistmaker.ui.common.TrackListAdapter
+import com.example.playlistmaker.ui.common.trackList.TrackListAdapter
 import com.example.playlistmaker.ui.player.PlayerFragment
 import com.example.playlistmaker.util.GsonClient
 import com.example.playlistmaker.util.debounce
@@ -47,8 +46,9 @@ class FavoriteTracksFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED){
-                viewModel.screenState.collect() { state -> render(state)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.screenState.collect() { state ->
+                    render(state)
                 }
             }
         }

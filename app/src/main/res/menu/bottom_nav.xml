@@ -8,10 +8,10 @@
     <item
         android:id="@+id/mediaLibraryFragment"
         android:icon="@drawable/library"
-        android:title="@string/library"/>
+        android:title="@string/library" />
 
     <item
         android:id="@+id/settingsFragment"
         android:icon="@drawable/settings"
-        android:title="@string/settings"/>
+        android:title="@string/settings" />
 </menu>
