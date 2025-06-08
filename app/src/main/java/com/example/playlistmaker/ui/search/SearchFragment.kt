@@ -5,6 +5,7 @@ import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -74,6 +75,7 @@ class SearchFragment : Fragment() {
             false
         ) { track ->
             viewModel.onTrackClicked(track)
+            Log.d("STATE"," ${track.isFavorite }")
             findNavController().navigate(
                 R.id.action_searchFragment_to_playerFragment,
                 PlayerFragment.createArgs(GsonClient.objectToJson(track))

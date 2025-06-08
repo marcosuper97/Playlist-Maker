@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface FavoriteControlRepository {
     fun getFavoriteTracks(): Flow<List<Track>>
-    suspend fun favoriteControl(track: Track)
+    suspend fun toggleFavoriteTrack(track: Track)
     fun getIdFavoriteTracks(): Flow<List<Long>>
 }

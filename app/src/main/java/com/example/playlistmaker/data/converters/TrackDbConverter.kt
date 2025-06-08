@@ -20,21 +20,6 @@ class TrackDbConverter {
         )
     }
 
-//    fun map(trackDto: TrackDto): FavoriteTracksEntity {
-//        return FavoriteTracksEntity(
-//            trackDto.trackId,
-//            trackDto.trackName,
-//            trackDto.artistName,
-//            trackDto.trackTimeMillis,
-//            trackDto.artworkUrl100,
-//            trackDto.collectionName,
-//            trackDto.releaseDate,
-//            trackDto.primaryGenreName,
-//            trackDto.country,
-//            trackDto.previewUrl,
-//        )
-//    }
-
     fun map(track: Track): TracksEntity {
         return TracksEntity(
             track.trackId,

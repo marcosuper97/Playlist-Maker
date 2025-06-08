@@ -12,7 +12,7 @@ class FavoriteControlInteractorImpl(private val favoriteRepository: FavoriteCont
     override fun getFavoriteTracks(): Flow<List<Track>> = favoriteRepository.getFavoriteTracks()
 
     override suspend fun favoriteControl(track: Track) {
-        favoriteRepository.favoriteControl(track)
+        favoriteRepository.toggleFavoriteTrack(track)
     }
 
     override fun syncingWithFavoriteTracks(searchList: List<Track>): Flow<List<Track>> = flow {

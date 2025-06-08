@@ -136,7 +136,7 @@ class PlaylistCreateFragment : Fragment() {
                 when (imageUri) {
                     null -> {
                         viewModel.createPlaylist(playlistName, playlistTitle, null)
-                        delay(300)
+                        delay(TIME_DELAY_SHORT)
                         parentFragment?.findNavController()?.navigateUp()
                     }
 
@@ -146,7 +146,7 @@ class PlaylistCreateFragment : Fragment() {
                             playlistTitle,
                             imageUri.toString()
                         )
-                        delay(600)
+                        delay(TIME_DELAY_LENGTH)
                         parentFragment?.findNavController()?.navigateUp()
                     }
                 }
@@ -179,7 +179,7 @@ class PlaylistCreateFragment : Fragment() {
     private fun openAppSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
             data = Uri.fromParts("package", requireContext().packageName, null)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK // Добавляем флаг для некоторых устройств
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         startActivity(intent)
     }
@@ -188,5 +188,10 @@ class PlaylistCreateFragment : Fragment() {
         override fun handleOnBackPressed() {
             exitDialog()
         }
+    }
+
+    companion object{
+        private const val TIME_DELAY_SHORT = 300L
+        private const val TIME_DELAY_LENGTH = 600L
     }
 }
