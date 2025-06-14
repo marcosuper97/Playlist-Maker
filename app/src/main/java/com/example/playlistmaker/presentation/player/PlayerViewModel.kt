@@ -13,6 +13,7 @@ import com.example.playlistmaker.util.MediaPlayerState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,7 +36,7 @@ class PlayerViewModel(
     private val _uiState = MutableStateFlow<UiPlayerState>(
         UiPlayerState.Default(false, "00:00", track.isFavorite)
     )
-    val uiState: StateFlow<UiPlayerState> = _uiState
+    val uiState: StateFlow<UiPlayerState> = _uiState.asStateFlow()
 
     private val _behaviorSheetState = MutableStateFlow<BehaviorState>(BehaviorState.EmptyData(null))
     val behaviorSheetState: StateFlow<BehaviorState> get() = _behaviorSheetState

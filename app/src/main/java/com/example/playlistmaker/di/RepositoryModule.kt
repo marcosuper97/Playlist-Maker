@@ -12,11 +12,13 @@ import com.example.playlistmaker.data.search.impl.SearchHistoryRepositoryImpl
 import com.example.playlistmaker.data.search.impl.SearchTrackRepositoryImpl
 import com.example.playlistmaker.data.settings.ThemeChangerRepository
 import com.example.playlistmaker.data.settings.impl.ThemeChangerRepositoryImpl
-import com.example.playlistmaker.data.sharing.SharingRepository
-import com.example.playlistmaker.data.sharing.impl.SharingRepositoryImpl
+import com.example.playlistmaker.data.sharing.playlist.PlaylistSharingRepositoryImpl
+import com.example.playlistmaker.domain.shairing.settings.SharingRepository
+import com.example.playlistmaker.data.sharing.settings.SharingRepositoryImpl
 import com.example.playlistmaker.domain.db.favorite.FavoriteControlRepository
 import com.example.playlistmaker.domain.db.playlist.PlaylistDbRepository
 import com.example.playlistmaker.domain.image_storage.ImageStorageRepository
+import com.example.playlistmaker.domain.shairing.playlist.PlaylistSharingRepository
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -51,5 +53,9 @@ val repositoryModule = module {
 
     single<ImageStorageRepository> {
         ImageStorageRepositoryImpl(get(), get())
+    }
+
+    single<PlaylistSharingRepository> { (context: Context) ->
+        PlaylistSharingRepositoryImpl(context)
     }
 }
