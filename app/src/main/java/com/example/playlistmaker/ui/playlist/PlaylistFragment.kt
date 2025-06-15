@@ -1,11 +1,13 @@
 package com.example.playlistmaker.ui.playlist
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -79,9 +81,9 @@ class PlaylistFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.playlistState.collect { state ->
-                    when(state){
-                        is PlaylistState.Data -> playlist=state.playlist
-                        is PlaylistState.OnUpdate -> playlist=state.playlist
+                    when (state) {
+                        is PlaylistState.Data -> playlist = state.playlist
+                        is PlaylistState.OnUpdate -> playlist = state.playlist
                         else -> Unit
                     }
                     renderUi(state)
@@ -104,7 +106,10 @@ class PlaylistFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope
         ) { track ->
             viewLifecycleOwner.lifecycleScope.launch {
-                showDeleteDialog(playlist.playlistId, track.trackId)
+                showDeleteDialog(
+                    getString(R.string.deleteTrackDialogTitle),
+                    null,
+                    onPositiveClick = { viewModel.deleteTrack(playlist.playlistId, track.trackId) })
             }
         }
 
@@ -127,7 +132,10 @@ class PlaylistFragment : Fragment() {
         }
 
         binding.deletePlaylist.setOnClickListener {
-            deletePlaylist()
+            showDeleteDialog(
+                getString(R.string.delete_playlist),
+                getString(R.string.dialog_playlist_delete_confirmation),
+                onPositiveClick = { viewModel.deletePlaylist() })
         }
 
         binding.edit.setOnClickListener {
@@ -158,6 +166,7 @@ class PlaylistFragment : Fragment() {
                     BottomSheetBehavior.STATE_HIDDEN -> {
                         binding.hiddenBack.visibility = View.GONE
                     }
+
                     else -> {}
                 }
             }
@@ -168,7 +177,7 @@ class PlaylistFragment : Fragment() {
     }
 
     private fun renderUi(state: PlaylistState) {
-        viewLifecycleOwner.lifecycleScope.launch{
+        viewLifecycleOwner.lifecycleScope.launch {
             when (state) {
                 is PlaylistState.OnUpdate -> {
                     updatePlaylistInfo(state.playlist)
@@ -211,7 +220,7 @@ class PlaylistFragment : Fragment() {
     private fun updateTrackListInfo(trackList: List<Track>) {
         binding.totalPlaybackTime.text =
             trackList.sumOf { it.trackTimeMillis }.toMinutes().minutesToString(requireContext())
-        when (trackList.isNotEmpty()){
+        when (trackList.isNotEmpty()) {
             true -> {
                 binding.emptyTrackList.visibility = View.GONE
                 binding.recyclerView.visibility = View.VISIBLE
@@ -234,29 +243,34 @@ class PlaylistFragment : Fragment() {
         }
     }
 
-    private fun deletePlaylist() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.deletePlaylist()
-        }
-    }
-
-    private fun deleteTrackFromPlaylist(playlistId: Long, trackId: Long) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.deleteTrack(playlistId, trackId)
-        }
-    }
-
-    private fun showDeleteDialog(playlistId: Long, trackId: Long) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.deleteTrackDialogTitle))
+    private fun showDeleteDialog(
+        titleString: String,
+        messageString: String?,
+        onPositiveClick: () -> Unit
+    ) {
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(titleString)
+            .apply {
+                if (messageString != null) setMessage(messageString)
+            }
             .setPositiveButton(getString(R.string.yes)) { _, _ ->
-                deleteTrackFromPlaylist(
-                    playlistId,
-                    trackId
-                )
+                onPositiveClick.invoke()
             }
             .setNegativeButton(getString(R.string.no), null)
-            .show()
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.apply {
+                setTextColor(ContextCompat.getColor(context, R.color.blue))
+            }
+
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.apply {
+                setTextColor(ContextCompat.getColor(context, R.color.blue))
+            }
+        }
+        dialog.show()
+
+            dialog.show()
     }
 
     private val backCallback = object : OnBackPressedCallback(true) {

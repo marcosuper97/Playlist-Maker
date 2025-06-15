@@ -1,7 +1,9 @@
 package com.example.playlistmaker.ui.playlist_forms.playlist_create_form
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -13,9 +15,12 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistFormBinding
 import com.example.playlistmaker.presentation.playlist_create.PlaylistCreateViewModel
@@ -36,7 +41,7 @@ open class PlaylistCreateFragment : Fragment() {
     protected var playlistName: String = ""
     protected var playlistTitle: String? = null
     protected var imageUri: Uri? = null
-    protected open val viewModel: PlaylistCreateViewModel by viewModel{ parametersOf(requireContext()) }
+    protected open val viewModel: PlaylistCreateViewModel by viewModel { parametersOf(requireContext()) }
     private val requester = PermissionRequester.instance()
 
 
@@ -67,6 +72,11 @@ open class PlaylistCreateFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
+        setupKeyboardBehavior()
+        binding.playlistDescription.cursorColor =
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.blue))
+        binding.playlistName.cursorColor =
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.blue))
         stateObserver()
         val pickMedia =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -122,26 +132,69 @@ open class PlaylistCreateFragment : Fragment() {
         }
     }
 
+    private fun setupKeyboardBehavior() {
+        val rootView = binding.root as? NestedScrollView
+
+        // Для каждого поля ввода добавляем обработчик фокуса
+        binding.playlistNameEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) scrollToView(binding.playlistDescriptionEditText, rootView)
+        }
+
+        binding.playlistDescriptionEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) scrollToView(binding.playlistDescriptionEditText, rootView)
+        }
+    }
+
+    private fun scrollToView(view: View, scrollView: NestedScrollView?) {
+        scrollView?.post {
+            // Плавная прокрутка к нужному элементу
+            scrollView.smoothScrollTo(0, view.bottom)
+        }
+    }
+
     protected open fun exitDialog() {
         if (playlistName.isNotEmpty() || playlistTitle != null || imageUri != null) {
-            MaterialAlertDialogBuilder(requireContext())
+            val dialogExit = MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.playlistExitDialogTitle))
                 .setMessage(getString(R.string.playlistExitDialogDescription))
                 .setPositiveButton(getString(R.string.complete)) { _, _ ->
                     parentFragment?.findNavController()?.navigateUp()
                 }
                 .setNegativeButton(getString(R.string.cancellation), null)
-                .show()
+                .create()
+            dialogExit.setOnShowListener {
+                dialogExit.getButton(AlertDialog.BUTTON_POSITIVE)?.apply {
+                    setTextColor(ContextCompat.getColor(context, R.color.blue))
+                }
+
+                dialogExit.getButton(AlertDialog.BUTTON_NEGATIVE)?.apply {
+                    setTextColor(ContextCompat.getColor(context, R.color.blue))
+                }
+            }
+            dialogExit.show()
         } else parentFragment?.findNavController()?.navigateUp()
     }
 
     private fun showSettingsDialog() {
-        MaterialAlertDialogBuilder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.settingsPermissionDialogTitle))
             .setMessage(getString(R.string.settingsPermissionDialogDescription))
             .setPositiveButton(getString(R.string.settings)) { _, _ -> openAppSettings() }
             .setNegativeButton(getString(R.string.cancellation), null)
-            .show()
+            .create()
+
+        dialog.setOnShowListener {
+            // Положительная кнопка (Settings)
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.apply {
+                setTextColor(ContextCompat.getColor(context, R.color.blue))
+            }
+
+            // Отрицательная кнопка (Cancel)
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.apply {
+                setTextColor(ContextCompat.getColor(context, R.color.blue))
+            }
+        }
+        dialog.show()
     }
 
     private fun openAppSettings() {
@@ -189,6 +242,7 @@ open class PlaylistCreateFragment : Fragment() {
                     is PlaylistCreateState.Success -> {
                         showSnackBar(binding.root, state.successMessage)
                     }
+
                     else -> Unit
                 }
             }

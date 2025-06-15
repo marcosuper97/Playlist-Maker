@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
@@ -30,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.playerFragment, R.id.playlistCreateFragment, R.id.playerFragment,R.id.playlistFragment -> {
+                R.id.playerFragment, R.id.playlistCreateFragment, R.id.playerFragment,R.id.playlistFragment, R.id.playlistEditFragment -> {
                     binding.bottomNav.visibility = View.GONE
                     systemBottomPadding(APPLY_BOTTOM_PADDING)
                 }

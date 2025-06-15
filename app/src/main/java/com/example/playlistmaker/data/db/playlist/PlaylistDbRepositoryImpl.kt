@@ -68,13 +68,23 @@ class PlaylistDbRepositoryImpl(
             }
         }
 
-    override fun getPlaylistWithTracks(playlistId: Long): Flow<PlaylistWithTracks?> =
-        db.playlistDao().getPlaylistWithTracks(playlistId).map { playlistWithTracksDb ->
-            when (playlistWithTracksDb){
+    override fun getPlaylistWithTracks(playlistId: Long): Flow<PlaylistWithTracks?> = flow {
+        val connections = db.connectionTableDao().getTracksFromPlaylist(playlistId)
+            .associateBy { it.trackId }
+        db.playlistDao().getPlaylistWithTracks(playlistId).collect { playlistWithTracksDb ->
+            val result = when (playlistWithTracksDb) {
                 null -> null
-                else -> playlistDbConverter.map(playlistWithTracksDb)
+                else -> {
+                    val sortedTracks = playlistWithTracksDb.tracks.sortedByDescending { track ->
+                        connections[track.trackId]?.addedDate ?: 0L
+                    }
+                    val sortedPlaylist = playlistWithTracksDb.copy(tracks = sortedTracks)
+                    playlistDbConverter.map(sortedPlaylist)
+                }
             }
+            emit(result)
         }
+    }
 
     override fun addTrackToPlaylist(
         track: Track,
@@ -100,7 +110,9 @@ class PlaylistDbRepositoryImpl(
 
             if (!db.connectionTableDao().isTrackInConnectionTable(trackId) &&
                 !db.trackDao().isFavoriteTrack(trackId)
-            ) { db.trackDao().deleteTrackFromTable(trackId) }
+            ) {
+                db.trackDao().deleteTrackFromTable(trackId)
+            }
 
             val tracksCount = db.connectionTableDao().getTracksCountInPlaylist(playlistId)
             db.playlistDao().updateTracksCount(tracksCount, playlistId)
