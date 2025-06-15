@@ -34,20 +34,24 @@ class PlaylistDbRepositoryImpl(
 
     override suspend fun deletePlaylist(playlistId: Long) {
         db.withTransaction {
-            val tracksIdFromPlaylist: List<Long> =
-                db.connectionTableDao().getTracksIdFromPlaylist(playlistId)
-            if (tracksIdFromPlaylist.isNotEmpty()) {
-                tracksIdFromPlaylist.forEach() { trackId ->
-                    db.connectionTableDao().deleteTrackFromPlaylist(playlistId, trackId)
-                    if (!db.connectionTableDao()
-                            .isTrackInConnectionTable(trackId) && !db.trackDao()
-                            .isFavoriteTrack(trackId)
-                    ) db.trackDao().deleteTrackFromTable(
-                        trackId
-                    )
+            val tracksInPlaylist = db.connectionTableDao().getTracksIdFromPlaylist(playlistId)
+
+            when (tracksInPlaylist.isNotEmpty()) {
+                true -> {
+                    tracksInPlaylist.forEach() { trackId ->
+                        db.connectionTableDao().deleteTrackFromPlaylist(playlistId, trackId)
+                        if (!db.connectionTableDao()
+                                .isTrackInConnectionTable(trackId) && !db.trackDao()
+                                .isFavoriteTrack(trackId)
+                        ) db.trackDao().deleteTrackFromTable(
+                            trackId
+                        )
+                    }
+                    db.playlistDao().deletePlaylistFromTable(playlistId)
                 }
-                db.playlistDao().deletePlaylistFromTable(playlistId)
-            } else db.playlistDao().deletePlaylistFromTable(playlistId)
+
+                false -> db.playlistDao().deletePlaylistFromTable(playlistId)
+            }
         }
     }
 
@@ -64,10 +68,23 @@ class PlaylistDbRepositoryImpl(
             }
         }
 
-    override fun getPlaylistWithTracks(playlistId: Long): Flow<PlaylistWithTracks> =
-        db.playlistDao().getPlaylistWithTracks(playlistId).map { playlistWithTracksDb ->
-            playlistDbConverter.map(playlistWithTracksDb)
+    override fun getPlaylistWithTracks(playlistId: Long): Flow<PlaylistWithTracks?> = flow {
+        val connections = db.connectionTableDao().getTracksFromPlaylist(playlistId)
+            .associateBy { it.trackId }
+        db.playlistDao().getPlaylistWithTracks(playlistId).collect { playlistWithTracksDb ->
+            val result = when (playlistWithTracksDb) {
+                null -> null
+                else -> {
+                    val sortedTracks = playlistWithTracksDb.tracks.sortedByDescending { track ->
+                        connections[track.trackId]?.addedDate ?: 0L
+                    }
+                    val sortedPlaylist = playlistWithTracksDb.copy(tracks = sortedTracks)
+                    playlistDbConverter.map(sortedPlaylist)
+                }
+            }
+            emit(result)
         }
+    }
 
     override fun addTrackToPlaylist(
         track: Track,
@@ -84,13 +101,26 @@ class PlaylistDbRepositoryImpl(
         }
     }
 
-    override suspend fun removeTrackFromPlaylist(playlistId: Long, trackId: Long) {
+    override suspend fun deleteTrackFromPlaylist(
+        playlistId: Long,
+        trackId: Long
+    ) {
         db.withTransaction {
             db.connectionTableDao().deleteTrackFromPlaylist(playlistId, trackId)
-            if (!db.connectionTableDao().isTrackInConnectionTable(trackId) && !db.trackDao()
-                    .isFavoriteTrack(trackId)
-            ) db.trackDao().deleteTrackFromTable(trackId)
+
+            if (!db.connectionTableDao().isTrackInConnectionTable(trackId) &&
+                !db.trackDao().isFavoriteTrack(trackId)
+            ) {
+                db.trackDao().deleteTrackFromTable(trackId)
+            }
+
+            val tracksCount = db.connectionTableDao().getTracksCountInPlaylist(playlistId)
+            db.playlistDao().updateTracksCount(tracksCount, playlistId)
         }
+    }
+
+    override suspend fun updatePlaylistInfo(playlist: Playlist) {
+        db.playlistDao().updatePlaylistInfo(playlistDbConverter.map(playlist))
     }
 
     private suspend fun addTrackToPlaylistInternal(trackEntity: TracksEntity, playlistId: Long) {

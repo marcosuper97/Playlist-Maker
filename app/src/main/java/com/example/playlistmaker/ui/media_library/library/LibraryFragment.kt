@@ -1,6 +1,7 @@
 package com.example.playlistmaker.ui.media_library.library
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,15 +13,21 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentLibraryBinding
+import com.example.playlistmaker.domain.models.Playlist
 import com.example.playlistmaker.presentation.library.LibraryFragmentViewModel
-import com.example.playlistmaker.ui.common.playlistList.PlaylistListAdapter
+import com.example.playlistmaker.ui.adapters.playlists_library.PlaylistListAdapter
+import com.example.playlistmaker.ui.playlist.PlaylistFragment
+import com.example.playlistmaker.util.GsonClient
+import com.example.playlistmaker.util.click_listenners.debounce
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class LibraryFragment : Fragment() {
     private lateinit var binding: FragmentLibraryBinding
     private lateinit var playlistAdapter: PlaylistListAdapter
-    private val viewModel: LibraryFragmentViewModel by viewModel()
+    private lateinit var onPlaylistClickDebounce: (Playlist) -> Unit
+    private val viewModel: LibraryFragmentViewModel by viewModel { parametersOf(requireContext()) }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,8 +47,21 @@ class LibraryFragment : Fragment() {
             }
         }
 
+        onPlaylistClickDebounce = debounce<Playlist>(
+            CLICK_DEBOUNCE_DELAY,
+            viewLifecycleOwner.lifecycleScope,
+            false
+        ) { playlist ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                parentFragment?.findNavController()?.navigate(
+                    R.id.action_mediaLibraryFragment_to_playlistFragment,
+                    PlaylistFragment.createArgs(GsonClient.playlistToJson(playlist))
+                )
+            }
+        }
 
-        playlistAdapter = PlaylistListAdapter(requireContext())
+
+        playlistAdapter = PlaylistListAdapter(requireContext(), onPlaylistClickDebounce)
         binding.recyclerView.adapter = playlistAdapter
 
         binding.createPlaylist.setOnClickListener {
@@ -72,6 +92,8 @@ class LibraryFragment : Fragment() {
         fun newInstance() = LibraryFragment().apply {
             arguments = bundleOf()
         }
+
+        private const val CLICK_DEBOUNCE_DELAY = 100L
     }
 
 }
