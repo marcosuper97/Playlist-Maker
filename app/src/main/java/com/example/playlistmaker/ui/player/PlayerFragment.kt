@@ -16,11 +16,11 @@ import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.domain.models.Playlist
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.player.PlayerViewModel
-import com.example.playlistmaker.ui.common.player_behavior.PlaylistBehaviorAdapter
+import com.example.playlistmaker.ui.adapters.player_behavior.PlaylistBehaviorAdapter
 import com.example.playlistmaker.ui.media_library.library.BehaviorState
-import com.example.playlistmaker.util.FragmentSnackExtension.showSnackBar
+import com.example.playlistmaker.util.extension.FragmentSnackExtension.showSnackBar
 import com.example.playlistmaker.util.GsonClient
-import com.example.playlistmaker.util.debounce
+import com.example.playlistmaker.util.click_listenners.debounce
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -40,9 +40,9 @@ class PlayerFragment : Fragment() {
     private val viewModel: PlayerViewModel by lazy {
         getViewModel {
             parametersOf(
-                GsonClient.objectFromJson(
+                GsonClient.trackFromJson(
                     arguments?.getString(TRACK_TAG).toString()
-                )
+                ),requireContext()
             )
         }
     }
@@ -66,7 +66,7 @@ class PlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
-        val bottomSheetContainer = binding.playerSheetBehavior
+        val bottomSheetContainer = binding.tracksSheetBehavior
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer)
 
         onPlaylistClickDebounce = debounce<Playlist>(
@@ -83,7 +83,7 @@ class PlayerFragment : Fragment() {
 
         binding.recyclerView.adapter = playlistAdapter
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        trackObject = arguments?.getString(TRACK_TAG)?.let { GsonClient.objectFromJson(it) }
+        trackObject = arguments?.getString(TRACK_TAG)?.let { GsonClient.trackFromJson(it) }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect { state ->

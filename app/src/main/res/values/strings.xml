@@ -39,11 +39,32 @@
     <string name="cancellation">Отмена</string>
     <string name="settingsPermissionDialogTitle">Откройте доступ к галерее</string>
     <string name="settingsPermissionDialogDescription">Для возможности загрузки изображения необходимо предоставить права доступа в настройках</string>
-    <plurals name="items_count">
+    <string name="share_playlist">Поделиться</string>
+    <string name="edit_info">Редактировать информацию</string>
+    <string name="delete_playlist">Удалить плейлист</string>
+    <string name="dialog_playlist_delete_confirmation">Хотите удалить плейлист?</string>
+    <plurals name="tracks_count">
         <item quantity="zero">%d треков</item>
         <item quantity="one">%d трек</item>
         <item quantity="few">%d трека</item>
         <item quantity="many">%d треков</item>
         <item quantity="other">%d треков</item>
     </plurals>
+    <plurals name="minutes_count">
+        <item quantity="zero">%d минут</item>
+        <item quantity="one">%d минута</item>
+        <item quantity="few">%d минуты</item>
+        <item quantity="many">%d минут</item>
+        <item quantity="other">%d минут</item>
+    </plurals>
+    <string name="minutes">минут</string>
+    <string name="zero_minutes">0 минут</string>
+    <string name="tracks">треков</string>
+    <string name="deleteTrackDialogTitle">Хотите удалить трек?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="change">Изменить</string>
+    <string name="editor">Редактор</string>
+    <string name="empty_title">Описание отсутствует.</string>
+    <string name="empty_trackList">Вы не добавили ни одного\nтрека в плейлист</string>
 </resources>
