@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import com.example.playlistmaker.domain.shairing.playlist.PlaylistSharingRepository
 
-class PlaylistSharingRepositoryImpl(private val context: Context): PlaylistSharingRepository {
+class PlaylistSharingRepositoryImpl(private val context: Context) : PlaylistSharingRepository {
     override fun sharingPlaylist(playlistToSharing: String) {
         val sharePlaylist = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"

@@ -8,11 +8,12 @@ import com.example.playlistmaker.domain.models.Track
 
 class PlaylistTracksAdapter(
     private val onTrackClickListener: (Track) -> Unit,
-    val onTrackLongClickListenner: (Track) -> Unit
+    val onTrackLongClickListenner: (Track) -> Unit,
+    private val onTrackSwipe: (Track) -> Unit
 ) :
     RecyclerView.Adapter<PlaylistTracksViewHolder>() {
 
-    var tracks: List<Track> = mutableListOf()
+    var tracks: MutableList<Track> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistTracksViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.track_layout, parent, false)
@@ -25,5 +26,10 @@ class PlaylistTracksAdapter(
 
     override fun getItemCount(): Int {
         return tracks.size
+    }
+
+    fun deleteItem(position: Int) {
+        onTrackSwipe(tracks[position])
+        notifyItemRemoved(position) // Анимация удаления
     }
 }

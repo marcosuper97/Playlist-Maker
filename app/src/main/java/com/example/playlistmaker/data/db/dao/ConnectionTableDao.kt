@@ -33,5 +33,5 @@ interface ConnectionTableDao {
     suspend fun getTracksCountInPlaylist(playlistId: Long): Long
 
     @Query("SELECT * FROM connection_table WHERE playlistId = :playlistId")
-    suspend fun getTracksFromPlaylist(playlistId: Long):List<ConnectionEntity>
+    suspend fun getTracksFromPlaylist(playlistId: Long): List<ConnectionEntity>
 }

@@ -74,7 +74,7 @@ class FavoriteTracksFragment : Fragment() {
             is FavoriteState.Content -> {
                 binding.placeholder.visibility = View.GONE
                 binding.emptyText.visibility = View.GONE
-                trackAdapter.tracks = favoriteState.favoriteList
+                trackAdapter.tracks = favoriteState.favoriteList.toMutableList()
                 trackAdapter.notifyDataSetChanged()
                 binding.recyclerView.visibility = View.VISIBLE
             }

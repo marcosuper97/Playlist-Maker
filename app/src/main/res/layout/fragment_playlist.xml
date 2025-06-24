@@ -139,7 +139,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="26dp"
             android:text="@string/empty_trackList"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"

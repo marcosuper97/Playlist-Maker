@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     style="@style/fragmentStyle"
-    tools:context= "com.example.playlistmaker.ui.media_library.MediaLibraryFragment">
+    tools:context="com.example.playlistmaker.ui.media_library.MediaLibraryFragment">
 
     <TextView
         android:id="@+id/createPlaylist"
