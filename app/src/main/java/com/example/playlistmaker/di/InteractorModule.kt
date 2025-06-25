@@ -44,7 +44,7 @@ val interactorModule = module {
         FavoriteControlInteractorImpl(get())
     }
 
-    factory<PlaylistInteractor> {(context: Context) ->
-        PlaylistInteractorImpl(get(), get(), get{ parametersOf(context) })
+    factory<PlaylistInteractor> { (context: Context) ->
+        PlaylistInteractorImpl(get(), get(), get { parametersOf(context) })
     }
 }

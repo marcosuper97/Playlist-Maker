@@ -24,7 +24,7 @@ class PlaylistViewModel(
         viewModelScope.launch {
             playlistInteractor.getPlaylistWithTracks(playlist.playlistId)
                 .collect { actualPlaylist ->
-                    when(actualPlaylist){
+                    when (actualPlaylist) {
                         null -> _playlistState.value = PlaylistState.IsDeleted
                         else -> postData(actualPlaylist)
                     }

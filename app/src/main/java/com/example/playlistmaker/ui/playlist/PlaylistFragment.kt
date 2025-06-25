@@ -15,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
@@ -26,14 +27,16 @@ import com.example.playlistmaker.ui.adapters.playlist_fragment.PlaylistTracksAda
 import com.example.playlistmaker.ui.player.PlayerFragment
 import com.example.playlistmaker.ui.playlist_forms.playlist_edit_form.PlaylistEditFragment
 import com.example.playlistmaker.util.GsonClient
+import com.example.playlistmaker.util.SwipeToDeleteCallback
+import com.example.playlistmaker.util.click_listenners.actionWithTrack
 import com.example.playlistmaker.util.click_listenners.debounce
-import com.example.playlistmaker.util.click_listenners.longTrackClick
 import com.example.playlistmaker.util.extension.FragmentSnackExtension.showSnackBar
 import com.example.playlistmaker.util.extension.minutesToString
 import com.example.playlistmaker.util.extension.toMinutes
 import com.example.playlistmaker.util.extension.trackCountToString
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.core.parameter.parametersOf
@@ -47,6 +50,7 @@ class PlaylistFragment : Fragment() {
     private var settingPlaylistBehavior = BottomSheetBehavior<View>()
     private lateinit var onTrackClickDebounce: (Track) -> Unit
     private lateinit var onTrackLongClick: (Track) -> Unit
+    private lateinit var onTrackSwipe: (Track) -> Unit
     private lateinit var playlist: Playlist
     private lateinit var viewModel: PlaylistViewModel
 
@@ -102,7 +106,7 @@ class PlaylistFragment : Fragment() {
             )
         }
 
-        onTrackLongClick = longTrackClick<Track>(
+        onTrackLongClick = actionWithTrack<Track>(
             viewLifecycleOwner.lifecycleScope
         ) { track ->
             viewLifecycleOwner.lifecycleScope.launch {
@@ -113,10 +117,22 @@ class PlaylistFragment : Fragment() {
             }
         }
 
-        tracksAdapter = PlaylistTracksAdapter(onTrackClickDebounce, onTrackLongClick)
+        onTrackSwipe = actionWithTrack<Track>(
+            viewLifecycleOwner.lifecycleScope
+        ) { track ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(350L)
+                viewModel.deleteTrack(playlist.playlistId, track.trackId)
+            }
+        }
+
+        tracksAdapter = PlaylistTracksAdapter(onTrackClickDebounce, onTrackLongClick, onTrackSwipe)
         binding.recyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.adapter = tracksAdapter
+        val swipeHandler = SwipeToDeleteCallback(tracksAdapter, requireContext())
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(binding.recyclerView)
 
         binding.shareButton.setOnClickListener {
             sharePlaylist(playlist.playlistId)
@@ -224,7 +240,7 @@ class PlaylistFragment : Fragment() {
             true -> {
                 binding.emptyTrackList.visibility = View.GONE
                 binding.recyclerView.visibility = View.VISIBLE
-                tracksAdapter.tracks = trackList
+                tracksAdapter.tracks = trackList.toMutableList()
                 tracksAdapter.notifyDataSetChanged()
             }
 
@@ -270,7 +286,7 @@ class PlaylistFragment : Fragment() {
         }
         dialog.show()
 
-            dialog.show()
+        dialog.show()
     }
 
     private val backCallback = object : OnBackPressedCallback(true) {

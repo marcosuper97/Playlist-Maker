@@ -18,9 +18,9 @@ import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.player.PlayerViewModel
 import com.example.playlistmaker.ui.adapters.player_behavior.PlaylistBehaviorAdapter
 import com.example.playlistmaker.ui.media_library.library.BehaviorState
-import com.example.playlistmaker.util.extension.FragmentSnackExtension.showSnackBar
 import com.example.playlistmaker.util.GsonClient
 import com.example.playlistmaker.util.click_listenners.debounce
+import com.example.playlistmaker.util.extension.FragmentSnackExtension.showSnackBar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -42,7 +42,7 @@ class PlayerFragment : Fragment() {
             parametersOf(
                 GsonClient.trackFromJson(
                     arguments?.getString(TRACK_TAG).toString()
-                ),requireContext()
+                ), requireContext()
             )
         }
     }

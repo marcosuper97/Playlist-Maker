@@ -7,7 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.Playlist
 
-class PlaylistListAdapter(private val context: Context, private val onTrackClickListener: (Playlist) -> Unit) :
+class PlaylistListAdapter(
+    private val context: Context,
+    private val onTrackClickListener: (Playlist) -> Unit
+) :
     RecyclerView.Adapter<PlaylistListViewHolder>() {
 
     var playlists: List<Playlist> = mutableListOf()

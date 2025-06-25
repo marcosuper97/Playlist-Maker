@@ -13,6 +13,6 @@ interface PlaylistInteractor {
     fun getPlaylistWithTracks(playlistId: Long): Flow<PlaylistWithTracks?>
     suspend fun addTrackToPlaylist(playlist: Playlist, track: Track): Flow<Result<String>>
     suspend fun deleteTrackFromPlaylist(playlistId: Long, trackId: Long)
-    fun sharePlaylist(playlistId: Long):Flow<Result<String>>
+    fun sharePlaylist(playlistId: Long): Flow<Result<String>>
     suspend fun updatePlaylistInfo(playlist: Playlist)
 }

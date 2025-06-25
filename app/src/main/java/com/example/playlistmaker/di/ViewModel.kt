@@ -19,7 +19,7 @@ import org.koin.dsl.module
 val viewModel = module {
 
     viewModel { (track: Track, context: Context) ->
-        PlayerViewModel(track, get(), get(), get{ parametersOf(context) })
+        PlayerViewModel(track, get(), get(), get { parametersOf(context) })
     }
 
     viewModel { (context: Context) ->
@@ -35,7 +35,7 @@ val viewModel = module {
     }
 
     viewModel { (context: Context) ->
-        LibraryFragmentViewModel(get{ parametersOf(context) })
+        LibraryFragmentViewModel(get { parametersOf(context) })
     }
 
     viewModel {
@@ -43,14 +43,14 @@ val viewModel = module {
     }
 
     viewModel { (context: Context) ->
-        PlaylistCreateViewModel(get{ parametersOf(context) })
+        PlaylistCreateViewModel(get { parametersOf(context) })
     }
 
-    viewModel{ (playlist: Playlist, context: Context) ->
-        PlaylistViewModel(playlist,get{ parametersOf(context) })
+    viewModel { (playlist: Playlist, context: Context) ->
+        PlaylistViewModel(playlist, get { parametersOf(context) })
     }
 
-    viewModel{ (playlist: Playlist, context:Context) ->
-        PlaylistEditViewModel(playlist, get{ parametersOf(context) })
+    viewModel { (playlist: Playlist, context: Context) ->
+        PlaylistEditViewModel(playlist, get { parametersOf(context) })
     }
 }

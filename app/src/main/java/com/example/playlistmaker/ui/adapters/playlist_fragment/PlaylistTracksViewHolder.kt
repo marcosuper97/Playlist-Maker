@@ -31,7 +31,7 @@ class PlaylistTracksViewHolder(
             }
         }
 
-        itemView.setOnLongClickListener{
+        itemView.setOnLongClickListener {
             val position = adapterPosition
             if (position != RecyclerView.NO_POSITION) {
                 onTrackLongClickListenner(track)
